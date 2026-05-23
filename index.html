@@ -10,421 +10,236 @@
   <meta name="apple-mobile-web-app-title" content="Extractor"/>
   <link rel="manifest" href="manifest.json"/>
   <title>Audio Extractor</title>
-
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:       #ffffff;
-      --bg2:      #f4f6fb;
-      --surface:  #f8f9fd;
-      --border:   #e2e8f5;
-      --blue:     #1a6fff;
-      --blue2:    #0d47cc;
-      --bluesoft: #e8f0ff;
-      --text:     #0d1530;
-      --muted:    #7a8aaa;
+      --bg: #ffffff; --bg2: #f4f6fb; --surface: #f8f9fd;
+      --border: #e2e8f5; --blue: #1a6fff; --blue2: #0d47cc;
+      --bluesoft: #e8f0ff; --text: #0d1530; --muted: #7a8aaa;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bot: env(safe-area-inset-bottom, 0px);
     }
-
-    html, body {
-      min-height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'JetBrains Mono', monospace;
-      overflow-x: hidden;
-    }
-
-    /* subtle dot grid */
+    html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; overflow-x: hidden; }
     body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
+      content: ''; position: fixed; inset: 0;
       background-image: radial-gradient(circle, #c8d8f0 1px, transparent 1px);
-      background-size: 28px 28px;
-      opacity: 0.5;
-      pointer-events: none;
-      z-index: 0;
+      background-size: 28px 28px; opacity: 0.5; pointer-events: none; z-index: 0;
     }
-
-    /* top blue accent bar */
     body::after {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--blue2), var(--blue), #7eb8ff);
-      z-index: 100;
+      content: ''; position: fixed; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--blue2), var(--blue), #7eb8ff); z-index: 100;
     }
 
-    /* ── INSTALL BANNER ── */
-    #installBanner {
-      display: none;
-      position: fixed;
-      top: 3px; left: 0; right: 0;
-      z-index: 99;
-      background: var(--blue2);
-      color: #fff;
-      padding: calc(var(--safe-top) + 10px) 16px 10px;
-      align-items: center;
-      gap: 12px;
-      font-size: 12px;
-      animation: slideDown 0.4s ease;
-    }
+    /* INSTALL BANNER */
+    #installBanner { display: none; position: fixed; top: 3px; left: 0; right: 0; z-index: 99; background: var(--blue2); color: #fff; padding: calc(var(--safe-top) + 10px) 16px 10px; align-items: center; gap: 12px; font-size: 12px; }
     #installBanner.show { display: flex; }
-    @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
     #installBanner span { flex: 1; opacity: 0.9; }
-    .banner-btn {
-      background: #fff;
-      color: var(--blue2);
-      border: none;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 500;
-      padding: 6px 14px;
-      cursor: pointer;
-    }
-    .banner-dismiss {
-      background: none; border: none; color: rgba(255,255,255,0.6);
-      font-size: 16px; cursor: pointer; padding: 0 4px;
-    }
+    .banner-btn { background: #fff; color: var(--blue2); border: none; font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 6px 14px; cursor: pointer; }
+    .banner-dismiss { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 16px; cursor: pointer; }
 
-    /* ── TABS ── */
-    .tabs {
-      position: sticky;
-      top: 3px;
-      z-index: 50;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      padding: calc(var(--safe-top) + 0px) 0 0;
-    }
+    /* TABS */
+    .tabs { position: sticky; top: 3px; z-index: 50; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); display: flex; }
+    .tab { flex: 1; padding: 14px 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+    .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
 
-    .tab {
-      flex: 1;
-      padding: 16px 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      background: none;
-      border: none;
-      border-bottom: 2px solid transparent;
-      cursor: pointer;
-      transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .tab.active {
-      color: var(--blue);
-      border-bottom-color: var(--blue);
-    }
-
-    /* ── SCROLL BODY ── */
-    .scroll-body {
-      position: relative;
-      z-index: 1;
-      padding: 32px 20px calc(var(--safe-bot) + 48px);
-      max-width: 560px;
-      margin: 0 auto;
-    }
-
-    /* ── PAGES ── */
+    /* SCROLL BODY */
+    .scroll-body { position: relative; z-index: 1; padding: 28px 18px calc(var(--safe-bot) + 48px); max-width: 560px; margin: 0 auto; }
     .page { display: none; }
     .page.active { display: block; animation: fadeUp 0.3s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    /* HERO - fixed title */
+    .hero { margin-bottom: 28px; }
+    .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 10vw, 3.4rem); font-weight: 800; line-height: 1; letter-spacing: -0.02em; color: var(--text); word-break: break-word; overflow-wrap: break-word; }
+    .hero h1 .accent { display: block; color: var(--blue); }
+    .hero-sub { margin-top: 12px; font-size: 11px; color: var(--muted); line-height: 1.7; }
 
-    /* ── HERO ── */
-    .hero { margin-bottom: 32px; }
+    /* CARD */
+    .card { background: var(--surface); border: 1px solid var(--border); padding: 20px 16px; margin-bottom: 10px; position: relative; }
+    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--blue), transparent 60%); opacity: 0.4; }
+    .card-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
 
-    .hero h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(2.6rem, 12vw, 4rem);
-      font-weight: 800;
-      line-height: 0.95;
-      letter-spacing: -0.03em;
-      color: var(--text);
-      word-break: keep-all;
-    }
-
-    .hero h1 .accent {
-      display: block;
-      color: var(--blue);
-    }
-
-    .hero-sub {
-      margin-top: 14px;
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: 0.02em;
-      line-height: 1.7;
-    }
-
-    /* ── CARD ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 20px 18px;
-      margin-bottom: 12px;
-      position: relative;
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--blue), transparent 60%);
-      opacity: 0.4;
-    }
-
-    .card-label {
-      font-size: 9px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
-
-    /* ── URL INPUT ── */
-    .url-wrap {
-      display: flex;
-      border: 1.5px solid var(--border);
-      background: #fff;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .url-wrap:focus-within {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(26,111,255,0.1);
-    }
-    .url-wrap input {
-      flex: 1; min-width: 0;
-      background: transparent; border: none; outline: none;
-      color: var(--text);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      padding: 13px 14px;
-    }
+    /* URL INPUT */
+    .url-wrap { display: flex; border: 1.5px solid var(--border); background: #fff; transition: border-color 0.2s, box-shadow 0.2s; }
+    .url-wrap:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,111,255,0.1); }
+    .url-wrap input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 12px 12px; }
     .url-wrap input::placeholder { color: var(--muted); }
-    .paste-btn {
-      background: var(--bluesoft);
-      border: none; border-left: 1.5px solid var(--border);
-      color: var(--blue);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; letter-spacing: 0.1em;
-      padding: 0 16px; cursor: pointer;
-      transition: background 0.2s; white-space: nowrap;
-    }
-    .paste-btn:active { background: #d0e4ff; }
+    .paste-btn { background: var(--bluesoft); border: none; border-left: 1.5px solid var(--border); color: var(--blue); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; padding: 0 14px; cursor: pointer; white-space: nowrap; }
 
-    /* ── OPTIONS ── */
-    .opts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-    .opt-group label {
-      font-size: 9px; letter-spacing: 0.18em; color: var(--muted);
-      display: block; margin-bottom: 7px;
-    }
-    .opt-group select {
-      width: 100%;
-      background: #fff; border: 1.5px solid var(--border);
-      color: var(--text);
-      font-family: 'JetBrains Mono', monospace; font-size: 12px;
-      padding: 10px 12px; outline: none; appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a8aaa' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 10px center;
-      cursor: pointer; transition: border-color 0.2s;
-    }
+    /* OPTIONS */
+    .opts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .opt-group label { font-size: 9px; letter-spacing: 0.18em; color: var(--muted); display: block; margin-bottom: 6px; }
+    .opt-group select { width: 100%; background: #fff; border: 1.5px solid var(--border); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 9px 10px; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a8aaa' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; cursor: pointer; }
     .opt-group select:focus { border-color: var(--blue); }
 
-    /* ── PILLS ── */
+    /* PILLS */
     .pills { display: flex; flex-wrap: wrap; gap: 6px; }
-    .pill {
-      font-size: 10px; letter-spacing: 0.1em;
-      padding: 5px 12px;
-      border: 1.5px solid var(--border); color: var(--muted);
-      cursor: pointer; transition: all 0.15s; user-select: none;
-      background: #fff;
-    }
-    .pill.on {
-      border-color: var(--blue); color: var(--blue);
-      background: var(--bluesoft);
-    }
+    .pill { font-size: 10px; letter-spacing: 0.1em; padding: 4px 10px; border: 1.5px solid var(--border); color: var(--muted); cursor: pointer; transition: all 0.15s; user-select: none; background: #fff; }
+    .pill.on { border-color: var(--blue); color: var(--blue); background: var(--bluesoft); }
 
-    /* ── GENERATE BTN ── */
-    .gen-btn {
-      width: 100%;
-      background: linear-gradient(135deg, var(--blue), var(--blue2));
-      color: #fff; border: none;
-      font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
-      letter-spacing: 0.06em;
-      padding: 17px; cursor: pointer; margin-bottom: 12px;
-      transition: opacity 0.2s, transform 0.1s;
-      -webkit-tap-highlight-color: transparent;
-      box-shadow: 0 4px 20px rgba(26,111,255,0.25);
-    }
+    /* BUTTONS */
+    .gen-btn { width: 100%; background: linear-gradient(135deg, var(--blue), var(--blue2)); color: #fff; border: none; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; padding: 16px; cursor: pointer; margin-bottom: 10px; box-shadow: 0 4px 20px rgba(26,111,255,0.25); -webkit-tap-highlight-color: transparent; transition: opacity 0.2s, transform 0.1s; }
     .gen-btn:active { transform: scale(0.98); opacity: 0.9; }
-    .gen-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--border); background: #fff; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 9px 14px; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+    .btn:active { background: var(--bg2); }
+    .btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn.danger { border-color: #ffccd0; color: #cc2233; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
 
-    /* ── OUTPUT ── */
+    /* OUTPUT */
     #output { display: none; }
     #output.show { display: block; animation: fadeUp 0.3s ease; }
 
-    /* ── TERMINAL ── */
-    .terminal {
-      background: #0d1530; border: 1px solid #1a2545;
-      padding: 18px; font-size: 11px; line-height: 2; overflow-x: auto;
-    }
-    .term-header {
-      display: flex; gap: 6px; align-items: center;
-      margin-bottom: 14px; padding-bottom: 12px;
-      border-bottom: 1px solid #1a2545;
-    }
+    /* TERMINAL */
+    .terminal { background: #0d1530; border: 1px solid #1a2545; padding: 16px; font-size: 11px; line-height: 2; overflow-x: auto; }
+    .term-header { display: flex; gap: 6px; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #1a2545; }
     .dot { width: 9px; height: 9px; border-radius: 50%; }
     .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
     .t-label { color: #4a5880; font-size: 10px; margin-left: 6px; }
-    .t-prompt { color: var(--blue); } .t-cmd { color: #c8d8ff; }
-    .t-ok { color: #4dffb0; } .t-dim { color: #2a3a5a; }
+    .t-prompt { color: var(--blue); } .t-cmd { color: #c8d8ff; } .t-ok { color: #4dffb0; } .t-dim { color: #2a3a5a; }
 
-    /* ── SNIPPET ── */
-    .isteps { display: flex; flex-direction: column; gap: 16px; }
-    .istep { display: flex; gap: 14px; align-items: flex-start; }
-    .istep-num {
-      font-size: 10px; color: var(--blue);
-      border: 1.5px solid var(--blue);
-      width: 24px; height: 24px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; margin-top: 1px;
-      background: var(--bluesoft);
-    }
+    /* SNIPPET */
+    .isteps { display: flex; flex-direction: column; gap: 14px; }
+    .istep { display: flex; gap: 12px; align-items: flex-start; }
+    .istep-num { font-size: 10px; color: var(--blue); border: 1.5px solid var(--blue); width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; background: var(--bluesoft); }
     .istep-body { flex: 1; }
-    .istep-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
-    .snippet {
-      background: #f0f4ff; border: 1px solid var(--border);
-      border-left: 2px solid var(--blue);
-      padding: 10px 12px; font-size: 11px; color: var(--blue2);
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 8px; margin-bottom: 6px; overflow-x: auto;
-    }
+    .istep-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .snippet { background: #f0f4ff; border: 1px solid var(--border); border-left: 2px solid var(--blue); padding: 9px 10px; font-size: 11px; color: var(--blue2); display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; overflow-x: auto; }
     .snippet code { white-space: nowrap; }
-    .copy-btn {
-      background: none; border: 1px solid var(--border); color: var(--muted);
-      font-family: 'JetBrains Mono', monospace; font-size: 9px;
-      letter-spacing: 0.1em; padding: 4px 8px; cursor: pointer;
-      white-space: nowrap; flex-shrink: 0; transition: all 0.2s;
-    }
-    .copy-btn:active, .copy-btn.ok { color: #0d8a50; border-color: #0d8a50; }
+    .copy-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; padding: 3px 7px; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.2s; }
+    .copy-btn.ok { color: #0d8a50; border-color: #0d8a50; }
 
-    /* ── USAGE PAGE ── */
-    .usage-step {
-      display: flex; gap: 16px; align-items: flex-start;
-      padding: 20px 18px;
-      background: var(--surface); border: 1px solid var(--border);
-      margin-bottom: 10px; position: relative;
-    }
-    .usage-step::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, var(--blue), transparent 60%);
-      opacity: 0.4;
-    }
-    .usage-num {
-      font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
-      color: var(--bluesoft); line-height: 1; flex-shrink: 0;
-      width: 36px; text-align: center;
-      -webkit-text-stroke: 1.5px var(--blue);
-    }
-    .usage-content { flex: 1; }
-    .usage-title {
-      font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
-      margin-bottom: 6px; color: var(--text);
-    }
+    /* ── PLAYER ── */
+    .player-upload { border: 2px dashed var(--border); padding: 32px 20px; text-align: center; cursor: pointer; transition: border-color 0.2s; background: #fff; }
+    .player-upload:hover, .player-upload.drag { border-color: var(--blue); background: var(--bluesoft); }
+    .player-upload input { display: none; }
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .upload-text { font-size: 12px; color: var(--muted); }
+    .upload-text strong { color: var(--blue); display: block; font-size: 13px; margin-bottom: 4px; }
+
+    /* NOW PLAYING */
+    .now-playing { display: none; }
+    .now-playing.show { display: block; }
+    .np-cover { width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, var(--blue2), var(--blue)); display: flex; align-items: center; justify-content: center; font-size: 48px; margin-bottom: 16px; position: relative; overflow: hidden; }
+    .np-cover::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), transparent 60%); }
+    .np-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .np-sub { font-size: 11px; color: var(--muted); margin-bottom: 20px; }
+
+    /* PROGRESS */
+    .progress-wrap { margin-bottom: 8px; position: relative; }
+    .progress-bar { width: 100%; height: 4px; background: var(--border); cursor: pointer; -webkit-appearance: none; appearance: none; outline: none; }
+    .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--blue); cursor: pointer; }
+    .progress-bar::-webkit-slider-runnable-track { background: linear-gradient(to right, var(--blue) var(--prog, 0%), var(--border) var(--prog, 0%)); height: 4px; }
+    .time-row { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+    /* CONTROLS */
+    .controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 16px 0; }
+    .ctrl-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 20px; padding: 8px; -webkit-tap-highlight-color: transparent; transition: color 0.2s; }
+    .ctrl-btn:active { color: var(--blue); }
+    .ctrl-btn.active { color: var(--blue); }
+    .play-btn { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--blue2)); border: none; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(26,111,255,0.35); -webkit-tap-highlight-color: transparent; transition: transform 0.1s; }
+    .play-btn:active { transform: scale(0.92); }
+
+    /* VOLUME */
+    .vol-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .vol-row span { font-size: 14px; }
+    .vol-slider { flex: 1; height: 3px; background: var(--border); -webkit-appearance: none; appearance: none; outline: none; cursor: pointer; }
+    .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--blue); }
+
+    /* PLAYLIST */
+    .playlist { max-height: 240px; overflow-y: auto; }
+    .pl-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+    .pl-item:last-child { border-bottom: none; }
+    .pl-item:hover, .pl-item.active { background: var(--bluesoft); }
+    .pl-item.active .pl-name { color: var(--blue); font-weight: 500; }
+    .pl-num { font-size: 10px; color: var(--muted); width: 18px; text-align: center; flex-shrink: 0; }
+    .pl-name { flex: 1; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pl-dur { font-size: 10px; color: var(--muted); flex-shrink: 0; }
+    .pl-del { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 0 4px; }
+    .pl-del:active { color: #cc2233; }
+    .pl-empty { padding: 24px; text-align: center; font-size: 12px; color: var(--muted); }
+
+    /* ── EDITOR ── */
+    .editor-upload { border: 2px dashed var(--border); padding: 28px 20px; text-align: center; cursor: pointer; background: #fff; transition: border-color 0.2s; }
+    .editor-upload:hover { border-color: var(--blue); background: var(--bluesoft); }
+    .editor-upload input { display: none; }
+
+    .waveform-wrap { position: relative; margin: 12px 0; background: #f0f4ff; border: 1px solid var(--border); height: 80px; overflow: hidden; cursor: crosshair; }
+    canvas#waveCanvas { width: 100%; height: 100%; display: block; }
+
+    .trim-info { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+    .trim-info span { color: var(--blue); font-weight: 500; }
+
+    .range-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .range-group label { font-size: 9px; letter-spacing: 0.15em; color: var(--muted); display: block; margin-bottom: 5px; }
+    .range-group input[type=number] { width: 100%; background: #fff; border: 1.5px solid var(--border); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 8px 10px; outline: none; }
+    .range-group input[type=number]:focus { border-color: var(--blue); }
+
+    .effect-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .effect-pill { font-size: 10px; padding: 5px 12px; border: 1.5px solid var(--border); color: var(--muted); cursor: pointer; background: #fff; transition: all 0.15s; user-select: none; }
+    .effect-pill.on { border-color: var(--blue); color: var(--blue); background: var(--bluesoft); }
+
+    .editor-preview { width: 100%; background: #0d1530; border: none; color: #4dffb0; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 10px 12px; margin-bottom: 10px; display: none; }
+    .editor-preview.show { display: block; }
+
+    /* USAGE PAGE */
+    .usage-step { display: flex; gap: 14px; align-items: flex-start; padding: 18px 16px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 10px; position: relative; }
+    .usage-step::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--blue), transparent 60%); opacity: 0.4; }
+    .usage-num { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: var(--bluesoft); line-height: 1; flex-shrink: 0; width: 34px; text-align: center; -webkit-text-stroke: 1.5px var(--blue); }
+    .usage-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
     .usage-desc { font-size: 11px; color: var(--muted); line-height: 1.7; }
     .usage-desc strong { color: var(--blue); font-weight: 500; }
-
-    .usage-note {
-      background: var(--bluesoft); border: 1px solid #c0d4ff;
-      padding: 14px 16px; margin-top: 10px;
-      font-size: 11px; color: var(--blue2); line-height: 1.7;
-    }
+    .usage-note { background: var(--bluesoft); border: 1px solid #c0d4ff; padding: 12px 14px; margin-top: 10px; font-size: 11px; color: var(--blue2); line-height: 1.7; }
     .usage-note strong { font-weight: 700; display: block; margin-bottom: 4px; }
 
-    /* ── COPYRIGHT ── */
-    .copyright-box {
-      background: #fff8f0; border: 1px solid #f0d0a0;
-      border-left: 3px solid #e07000;
-      padding: 16px; margin-top: 16px;
-      font-size: 11px; color: #7a5000; line-height: 1.8;
-    }
+    /* COPYRIGHT */
+    .copyright-box { background: #fff8f0; border: 1px solid #f0d0a0; border-left: 3px solid #e07000; padding: 14px; margin-top: 14px; font-size: 11px; color: #7a5000; line-height: 1.8; }
     .copyright-box strong { display: block; font-size: 12px; color: #5a3800; margin-bottom: 6px; }
 
-    /* ── FOOTER ── */
-    .footer {
-      margin-top: 36px; padding-top: 20px;
-      border-top: 1px solid var(--border);
-      display: flex; justify-content: space-between;
-      align-items: center; flex-wrap: wrap; gap: 8px;
-    }
+    /* FOOTER */
+    .footer { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .footer-credit { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; }
     .footer-credit span { color: var(--blue); font-weight: 500; }
-    .footer-ver { font-size: 10px; color: var(--border); letter-spacing: 0.08em; }
+    .footer-ver { font-size: 10px; color: var(--border); }
 
-    /* ── TOAST ── */
-    .toast {
-      position: fixed;
-      bottom: calc(var(--safe-bot) + 24px); left: 50%;
-      transform: translateX(-50%) translateY(16px);
-      background: var(--blue2); color: #fff;
-      font-size: 11px; letter-spacing: 0.08em;
-      padding: 11px 22px; opacity: 0;
-      transition: all 0.3s; pointer-events: none;
-      z-index: 500; white-space: nowrap;
-      box-shadow: 0 4px 20px rgba(13,71,204,0.3);
-    }
+    /* TOAST */
+    .toast { position: fixed; bottom: calc(var(--safe-bot) + 20px); left: 50%; transform: translateX(-50%) translateY(16px); background: var(--blue2); color: #fff; font-size: 11px; padding: 10px 20px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 500; white-space: nowrap; box-shadow: 0 4px 20px rgba(13,71,204,0.3); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     @keyframes blink { 50% { opacity: 0; } }
-    .cursor {
-      display: inline-block; width: 7px; height: 12px;
-      background: var(--blue); vertical-align: middle;
-      animation: blink 1s infinite; margin-left: 2px;
-    }
+    .cursor { display: inline-block; width: 7px; height: 12px; background: var(--blue); vertical-align: middle; animation: blink 1s infinite; margin-left: 2px; }
+
+    /* scrollbar */
+    .playlist::-webkit-scrollbar { width: 4px; }
+    .playlist::-webkit-scrollbar-track { background: var(--bg2); }
+    .playlist::-webkit-scrollbar-thumb { background: var(--border); }
   </style>
 </head>
 <body>
 
-<!-- INSTALL BANNER -->
 <div id="installBanner">
-  <span>📱 Install as app on your home screen</span>
+  <span>📱 Install as app</span>
   <button class="banner-btn" id="installBtn">INSTALL</button>
   <button class="banner-dismiss" id="dismissBtn">✕</button>
 </div>
 
-<!-- TABS -->
 <div class="tabs">
-  <button class="tab active" onclick="switchTab('extractor', this)">EXTRACTOR</button>
-  <button class="tab" onclick="switchTab('howto', this)">HOW TO USE</button>
+  <button class="tab active" onclick="switchTab('extractor',this)">EXTRACT</button>
+  <button class="tab" onclick="switchTab('player',this)">PLAYER</button>
+  <button class="tab" onclick="switchTab('editor',this)">EDITOR</button>
+  <button class="tab" onclick="switchTab('howto',this)">GUIDE</button>
 </div>
 
-<!-- MAIN -->
 <div class="scroll-body">
 
-  <!-- ── PAGE: EXTRACTOR ── -->
+  <!-- ══════════ EXTRACTOR ══════════ -->
   <div class="page active" id="page-extractor">
-
     <div class="hero">
       <h1>AUDIO<span class="accent">EXTRACTOR</span></h1>
-      <p class="hero-sub">Paste a YouTube URL → Generate command → Run in terminal</p>
+      <p class="hero-sub">Paste YouTube URL → Generate command → Run in terminal</p>
     </div>
 
-    <!-- URL -->
     <div class="card">
       <div class="card-label">01 — Source URL</div>
       <div class="url-wrap">
@@ -433,304 +248,422 @@
       </div>
     </div>
 
-    <!-- OPTIONS -->
     <div class="card">
       <div class="card-label">02 — Output Settings</div>
       <div class="opts-row">
-        <div class="opt-group">
-          <label>Format</label>
+        <div class="opt-group"><label>Format</label>
           <select id="fmtSel" onchange="syncPills()">
-            <option value="mp3">MP3</option>
-            <option value="m4a">M4A</option>
-            <option value="wav">WAV</option>
-            <option value="flac">FLAC</option>
-            <option value="aac">AAC</option>
-            <option value="opus">OPUS</option>
+            <option value="mp3">MP3</option><option value="m4a">M4A</option>
+            <option value="wav">WAV</option><option value="flac">FLAC</option>
+            <option value="aac">AAC</option><option value="opus">OPUS</option>
           </select>
         </div>
-        <div class="opt-group">
-          <label>Quality</label>
+        <div class="opt-group"><label>Quality</label>
           <select id="qualSel">
-            <option value="128">128 kbps</option>
-            <option value="192" selected>192 kbps</option>
-            <option value="256">256 kbps</option>
-            <option value="320">320 kbps ★</option>
+            <option value="128">128 kbps</option><option value="192" selected>192 kbps</option>
+            <option value="256">256 kbps</option><option value="320">320 kbps ★</option>
           </select>
         </div>
       </div>
       <div class="pills" id="pills">
-        <div class="pill on" data-v="mp3">MP3</div>
-        <div class="pill" data-v="m4a">M4A</div>
-        <div class="pill" data-v="wav">WAV</div>
-        <div class="pill" data-v="flac">FLAC</div>
-        <div class="pill" data-v="aac">AAC</div>
-        <div class="pill" data-v="opus">OPUS</div>
+        <div class="pill on" data-v="mp3">MP3</div><div class="pill" data-v="m4a">M4A</div>
+        <div class="pill" data-v="wav">WAV</div><div class="pill" data-v="flac">FLAC</div>
+        <div class="pill" data-v="aac">AAC</div><div class="pill" data-v="opus">OPUS</div>
       </div>
     </div>
 
-    <!-- GENERATE -->
     <button class="gen-btn" onclick="generate()">▶ &nbsp;GENERATE COMMAND</button>
 
-    <!-- OUTPUT -->
     <div id="output">
       <div class="card">
         <div class="card-label">03 — Command Output</div>
         <div class="terminal">
           <div class="term-header">
             <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
-            <span class="t-label">bash — terminal</span>
+            <span class="t-label">bash</span>
           </div>
           <div id="termBody"></div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-label">Setup Guide</div>
         <div class="isteps">
-          <div class="istep">
-            <div class="istep-num">1</div>
-            <div class="istep-body">
-              <div class="istep-title">Install yt-dlp</div>
-              <div class="snippet"><code>pip install yt-dlp</code><button class="copy-btn" onclick="cp('pip install yt-dlp',this)">COPY</button></div>
-            </div>
-          </div>
-          <div class="istep">
-            <div class="istep-num">2</div>
-            <div class="istep-body">
-              <div class="istep-title">Install ffmpeg</div>
-              <div class="snippet"><code>brew install ffmpeg</code><button class="copy-btn" onclick="cp('brew install ffmpeg',this)">macOS</button></div>
-              <div class="snippet"><code>sudo apt install ffmpeg</code><button class="copy-btn" onclick="cp('sudo apt install ffmpeg',this)">Ubuntu</button></div>
-              <div class="snippet"><code>winget install ffmpeg</code><button class="copy-btn" onclick="cp('winget install ffmpeg',this)">Windows</button></div>
-            </div>
-          </div>
-          <div class="istep">
-            <div class="istep-num">3</div>
-            <div class="istep-body">
-              <div class="istep-title">Run the command</div>
-              <div class="snippet">
-                <code id="finalCmd" style="color:var(--blue2)">Generate a command first ↑</code>
-                <button class="copy-btn" id="finalCopy" onclick="cpFinal(this)">COPY</button>
-              </div>
-            </div>
-          </div>
+          <div class="istep"><div class="istep-num">1</div><div class="istep-body"><div class="istep-title">Install yt-dlp</div><div class="snippet"><code>pip install yt-dlp</code><button class="copy-btn" onclick="cp('pip install yt-dlp',this)">COPY</button></div></div></div>
+          <div class="istep"><div class="istep-num">2</div><div class="istep-body"><div class="istep-title">Install ffmpeg</div>
+            <div class="snippet"><code>brew install ffmpeg</code><button class="copy-btn" onclick="cp('brew install ffmpeg',this)">macOS</button></div>
+            <div class="snippet"><code>sudo apt install ffmpeg</code><button class="copy-btn" onclick="cp('sudo apt install ffmpeg',this)">Ubuntu</button></div>
+            <div class="snippet"><code>winget install ffmpeg</code><button class="copy-btn" onclick="cp('winget install ffmpeg',this)">Windows</button></div>
+          </div></div>
+          <div class="istep"><div class="istep-num">3</div><div class="istep-body"><div class="istep-title">Run the command</div>
+            <div class="snippet"><code id="finalCmd" style="color:var(--blue2)">Generate above ↑</code><button class="copy-btn" id="finalCopy" onclick="cpFinal(this)">COPY</button></div>
+          </div></div>
         </div>
       </div>
     </div>
 
-    <!-- COPYRIGHT -->
-    <div class="copyright-box">
-      <strong>⚠ 저작권 안내 / Copyright Notice</strong>
-      본 도구는 개인적, 비상업적 용도로만 사용하세요.<br/>
-      저작권이 있는 콘텐츠의 무단 다운로드 및 배포는 저작권법에 위반될 수 있습니다.<br/>
-      상업적 이용 및 무단 재배포를 금지합니다.<br/>
-      <br/>
-      This tool is for personal, non-commercial use only.<br/>
-      Unauthorized downloading or redistribution of copyrighted content may violate applicable laws.
-    </div>
-
-    <div class="footer">
-      <div class="footer-credit">MADE BY <span>추인엽</span></div>
-      <div class="footer-ver">v3.0 · PWA</div>
-    </div>
-
+    <div class="copyright-box"><strong>⚠ 저작권 안내 / Copyright Notice</strong>본 도구는 개인적, 비상업적 용도로만 사용하세요.<br/>저작권이 있는 콘텐츠의 무단 다운로드, 배포, 상업적 이용을 금지합니다.<br/>For personal, non-commercial use only.</div>
+    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v4.0 · PWA</div></div>
   </div>
 
-  <!-- ── PAGE: HOW TO USE ── -->
-  <div class="page" id="page-howto">
+  <!-- ══════════ PLAYER ══════════ -->
+  <div class="page" id="page-player">
+    <div class="hero">
+      <h1>AUDIO<span class="accent">PLAYER</span></h1>
+      <p class="hero-sub">Upload audio files to play · Supports playlist</p>
+    </div>
 
+    <!-- upload -->
+    <label class="player-upload" id="playerUploadArea">
+      <input type="file" id="playerFileInput" accept="audio/*" multiple/>
+      <div class="upload-icon">🎵</div>
+      <div class="upload-text"><strong>Tap to add audio files</strong>MP3, WAV, FLAC, M4A, AAC supported</div>
+    </label>
+
+    <!-- now playing -->
+    <div class="now-playing" id="nowPlaying">
+      <div class="card" style="margin-top:12px">
+        <div class="np-cover" id="npCover">🎵</div>
+        <div class="np-title" id="npTitle">—</div>
+        <div class="np-sub" id="npSub">0:00</div>
+
+        <div class="progress-wrap">
+          <input type="range" class="progress-bar" id="progressBar" min="0" max="100" value="0" step="0.1"/>
+          <div class="time-row"><span id="timeCurrent">0:00</span><span id="timeDuration">0:00</span></div>
+        </div>
+
+        <div class="controls">
+          <button class="ctrl-btn" id="btnShuffle" onclick="toggleShuffle()" title="Shuffle">🔀</button>
+          <button class="ctrl-btn" onclick="prevTrack()" title="Prev">⏮</button>
+          <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+          <button class="ctrl-btn" onclick="nextTrack()" title="Next">⏭</button>
+          <button class="ctrl-btn" id="btnRepeat" onclick="toggleRepeat()" title="Repeat">🔁</button>
+        </div>
+
+        <div class="vol-row">
+          <span>🔈</span>
+          <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.01" value="1"/>
+          <span>🔊</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- playlist -->
+    <div class="card" id="playlistCard" style="display:none">
+      <div class="card-label" style="display:flex;justify-content:space-between;align-items:center">
+        <span>PLAYLIST (<span id="plCount">0</span>)</span>
+        <button class="btn danger" style="font-size:9px;padding:3px 8px" onclick="clearPlaylist()">CLEAR ALL</button>
+      </div>
+      <div class="playlist" id="playlist"></div>
+    </div>
+
+    <div class="copyright-box" style="margin-top:12px"><strong>⚠ 저작권 안내</strong>개인 소장 파일만 재생하세요. 무단 배포 금지.</div>
+    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v4.0 · PWA</div></div>
+  </div>
+
+  <!-- ══════════ EDITOR ══════════ -->
+  <div class="page" id="page-editor">
+    <div class="hero">
+      <h1>AUDIO<span class="accent">EDITOR</span></h1>
+      <p class="hero-sub">Trim · Fade out · Preview · Export command</p>
+    </div>
+
+    <label class="editor-upload" id="editorUploadArea">
+      <input type="file" id="editorFileInput" accept="audio/*"/>
+      <div class="upload-icon">✂️</div>
+      <div class="upload-text"><strong>Tap to load audio file</strong>Load a file to edit</div>
+    </label>
+
+    <div id="editorPanel" style="display:none">
+      <div class="card" style="margin-top:12px">
+        <div class="card-label">WAVEFORM</div>
+        <div class="waveform-wrap" id="waveformWrap">
+          <canvas id="waveCanvas"></canvas>
+        </div>
+        <div class="trim-info">
+          <div>Start: <span id="trimStartLabel">0.0s</span></div>
+          <div>End: <span id="trimEndLabel">0.0s</span></div>
+          <div>Duration: <span id="trimDurLabel">0.0s</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">TRIM RANGE</div>
+        <div class="range-row">
+          <div class="range-group"><label>Start (sec)</label><input type="number" id="trimStart" min="0" step="0.1" value="0" oninput="updateTrimInfo()"/></div>
+          <div class="range-group"><label>End (sec)</label><input type="number" id="trimEnd" min="0" step="0.1" value="0" oninput="updateTrimInfo()"/></div>
+        </div>
+
+        <div class="card-label" style="margin-top:8px">EFFECTS</div>
+        <div class="effect-row">
+          <div class="effect-pill" data-e="fadein" onclick="toggleEffect(this)">Fade In</div>
+          <div class="effect-pill" data-e="fadeout" onclick="toggleEffect(this)">Fade Out</div>
+          <div class="effect-pill" data-e="normalize" onclick="toggleEffect(this)">Normalize</div>
+        </div>
+
+        <div class="card-label" style="margin-top:8px">PREVIEW COMMAND</div>
+        <pre class="editor-preview" id="editorPreview"></pre>
+
+        <div class="btn-row">
+          <button class="btn primary" onclick="previewTrim()">▶ Preview</button>
+          <button class="btn" onclick="generateEditCmd()">⚙ Generate Command</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">PLAYBACK</div>
+        <audio id="editorAudio" controls style="width:100%;margin-top:4px"></audio>
+      </div>
+    </div>
+
+    <div class="copyright-box" style="margin-top:12px"><strong>⚠ 저작권 안내</strong>개인 소장 파일만 편집하세요. 무단 배포 금지.</div>
+    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v4.0 · PWA</div></div>
+  </div>
+
+  <!-- ══════════ GUIDE ══════════ -->
+  <div class="page" id="page-howto">
     <div class="hero">
       <h1>HOW TO<span class="accent">USE</span></h1>
-      <p class="hero-sub">Step-by-step guide to extract audio from YouTube</p>
+      <p class="hero-sub">Step-by-step guide</p>
     </div>
 
-    <div class="usage-step">
-      <div class="usage-num">1</div>
-      <div class="usage-content">
-        <div class="usage-title">Copy YouTube URL</div>
-        <div class="usage-desc">
-          YouTube에서 원하는 영상을 열고<br/>
-          주소창의 URL을 복사하세요.<br/>
-          <strong>예: https://youtu.be/XXXXXXX</strong>
-        </div>
-      </div>
-    </div>
+    <div class="usage-step"><div class="usage-num">1</div><div><div class="usage-title">Copy YouTube URL</div><div class="usage-desc">유튜브 영상 주소를 복사하세요.<br/><strong>예: https://youtu.be/XXXXXXX</strong></div></div></div>
+    <div class="usage-step"><div class="usage-num">2</div><div><div class="usage-title">EXTRACT 탭 → Paste & Generate</div><div class="usage-desc">PASTE 버튼으로 URL 붙여넣기 후<br/><strong>GENERATE COMMAND</strong> 클릭</div></div></div>
+    <div class="usage-step"><div class="usage-num">3</div><div><div class="usage-title">Terminal에서 실행</div><div class="usage-desc">생성된 커맨드를 복사해<br/>PC 터미널에서 실행하면 음원 파일이 저장됩니다.<br/><strong>yt-dlp와 ffmpeg 설치 필요</strong></div></div></div>
+    <div class="usage-step"><div class="usage-num">4</div><div><div class="usage-title">PLAYER 탭 → 재생</div><div class="usage-desc">저장된 음원 파일을 불러와<br/><strong>반복·셔플·재생목록</strong> 기능으로 감상</div></div></div>
+    <div class="usage-step"><div class="usage-num">5</div><div><div class="usage-title">EDITOR 탭 → 편집</div><div class="usage-desc">파일을 불러와 <strong>구간 자르기</strong>, <strong>페이드인/아웃</strong> 효과 설정 후<br/>ffmpeg 커맨드를 생성해 PC에서 실행</div></div></div>
 
-    <div class="usage-step">
-      <div class="usage-num">2</div>
-      <div class="usage-content">
-        <div class="usage-title">Paste & Set Options</div>
-        <div class="usage-desc">
-          EXTRACTOR 탭으로 이동 후<br/>
-          <strong>PASTE</strong> 버튼을 눌러 URL을 붙여넣고<br/>
-          원하는 <strong>형식(MP3 등)</strong>과 <strong>품질</strong>을 선택하세요.
-        </div>
-      </div>
-    </div>
+    <div class="usage-note"><strong>💡 지원 형식</strong>MP3 · WAV · FLAC · M4A · AAC · OPUS<br/><br/><strong>⚠ 백그라운드 재생</strong>PLAYER 탭에서 파일 재생 중 화면을 끄면<br/>브라우저 설정에 따라 재생이 유지될 수 있습니다.<br/>완전한 백그라운드 재생은 네이티브 앱에서만 보장됩니다.</div>
 
-    <div class="usage-step">
-      <div class="usage-num">3</div>
-      <div class="usage-content">
-        <div class="usage-title">Generate Command</div>
-        <div class="usage-desc">
-          <strong>GENERATE COMMAND</strong> 버튼을 누르면<br/>
-          터미널에서 실행할 커맨드가 자동 생성됩니다.
-        </div>
-      </div>
-    </div>
-
-    <div class="usage-step">
-      <div class="usage-num">4</div>
-      <div class="usage-content">
-        <div class="usage-title">Install Dependencies</div>
-        <div class="usage-desc">
-          처음 사용 시 아래 패키지를 먼저 설치하세요.<br/>
-          <strong>yt-dlp</strong> — 유튜브 다운로더<br/>
-          <strong>ffmpeg</strong> — 오디오 변환 엔진
-        </div>
-      </div>
-    </div>
-
-    <div class="usage-step">
-      <div class="usage-num">5</div>
-      <div class="usage-content">
-        <div class="usage-title">Run in Terminal</div>
-        <div class="usage-desc">
-          생성된 커맨드를 <strong>COPY</strong> 후<br/>
-          PC의 터미널(macOS: Terminal, Windows: CMD 또는 PowerShell)에 붙여넣고 실행하면<br/>
-          현재 폴더에 음원 파일이 저장됩니다.
-        </div>
-      </div>
-    </div>
-
-    <div class="usage-note">
-      <strong>💡 지원 형식 안내</strong>
-      MP3 — 가장 범용적, 스트리밍 추천<br/>
-      WAV — 무손실, 용량 큼<br/>
-      FLAC — 무손실 압축, 음질 최우선<br/>
-      M4A / AAC / OPUS — 모바일 최적화
-    </div>
-
-    <div class="copyright-box">
-      <strong>⚠ 저작권 안내 / Copyright Notice</strong>
-      본 도구는 개인적, 비상업적 용도로만 사용하세요.<br/>
-      저작권이 있는 콘텐츠의 무단 다운로드 및 배포는 저작권법에 위반될 수 있습니다.<br/>
-      상업적 이용 및 무단 재배포를 금지합니다.
-    </div>
-
-    <div class="footer">
-      <div class="footer-credit">MADE BY <span>추인엽</span></div>
-      <div class="footer-ver">v3.0 · PWA</div>
-    </div>
-
+    <div class="copyright-box"><strong>⚠ 저작권 안내 / Copyright Notice</strong>본 도구는 개인적, 비상업적 용도로만 사용하세요.<br/>저작권이 있는 콘텐츠의 무단 다운로드 및 배포는 저작권법에 위반됩니다.<br/>상업적 이용 및 무단 재배포를 금지합니다.</div>
+    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v4.0 · PWA</div></div>
   </div>
 
 </div><!-- /scroll-body -->
-
 <div class="toast" id="toast"></div>
 
+<!-- HIDDEN AUDIO -->
+<audio id="mainAudio"></audio>
+
 <script>
-  // ── PWA ──
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  }
+// ── PWA ──
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt=e; document.getElementById('installBanner').classList.add('show'); });
+document.getElementById('installBtn').addEventListener('click', async () => { if(!deferredPrompt)return; deferredPrompt.prompt(); const {outcome}=await deferredPrompt.userChoice; if(outcome==='accepted')toast('App installed ✓'); deferredPrompt=null; document.getElementById('installBanner').classList.remove('show'); });
+document.getElementById('dismissBtn').addEventListener('click', ()=>document.getElementById('installBanner').classList.remove('show'));
 
-  let deferredPrompt = null;
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById('installBanner').classList.add('show');
+// ── TABS ──
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('page-'+name).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── EXTRACTOR ──
+document.querySelectorAll('.pill').forEach(p=>p.addEventListener('click',()=>{ document.getElementById('fmtSel').value=p.dataset.v; syncPills(); }));
+function syncPills(){ const v=document.getElementById('fmtSel').value; document.querySelectorAll('#page-extractor .pill').forEach(p=>p.classList.toggle('on',p.dataset.v===v)); }
+async function doPaste(){ try{ const t=await navigator.clipboard.readText(); document.getElementById('urlInput').value=t; toast('Pasted ✓'); }catch{ toast('Clipboard permission required'); } }
+function generate(){
+  const url=document.getElementById('urlInput').value.trim();
+  const fmt=document.getElementById('fmtSel').value;
+  const qual=document.getElementById('qualSel').value;
+  if(!url){toast('Enter a YouTube URL');return;}
+  if(!url.includes('youtube')&&!url.includes('youtu.be')){toast('Valid YouTube URL required');return;}
+  const cmd=`yt-dlp -x --audio-format ${fmt} --audio-quality ${qual}k "${url}"`;
+  document.getElementById('termBody').innerHTML=`<div><span class="t-prompt">❯</span> <span class="t-cmd">${esc(cmd)}</span></div><div class="t-dim">[yt-dlp] Fetching metadata...</div><div class="t-dim">[download] 100% of ~4.20MiB</div><div class="t-dim">[ffmpeg] Extracting audio → .${fmt}</div><div class="t-ok" style="margin-top:4px">✔ Done → output.${fmt}</div><span class="cursor"></span>`;
+  document.getElementById('finalCmd').textContent=cmd;
+  const out=document.getElementById('output'); out.classList.add('show');
+  setTimeout(()=>out.scrollIntoView({behavior:'smooth',block:'start'}),80);
+  toast('Command generated ✓');
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function cp(text,btn){navigator.clipboard.writeText(text).then(()=>{const o=btn.textContent;btn.textContent='✓';btn.classList.add('ok');setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok');},1500)});}
+function cpFinal(btn){cp(document.getElementById('finalCmd').textContent,btn);}
+
+// ── PLAYER ──
+const audio = document.getElementById('mainAudio');
+let playlist = [], currentIndex = 0, isShuffled = false, repeatMode = 0; // 0=none,1=one,2=all
+let shuffleOrder = [];
+
+const playerFileInput = document.getElementById('playerFileInput');
+const playerUploadArea = document.getElementById('playerUploadArea');
+
+playerUploadArea.addEventListener('dragover', e=>{ e.preventDefault(); playerUploadArea.classList.add('drag'); });
+playerUploadArea.addEventListener('dragleave', ()=>playerUploadArea.classList.remove('drag'));
+playerUploadArea.addEventListener('drop', e=>{ e.preventDefault(); playerUploadArea.classList.remove('drag'); addFiles(Array.from(e.dataTransfer.files)); });
+playerFileInput.addEventListener('change', e=>addFiles(Array.from(e.target.files)));
+
+function addFiles(files){
+  files.filter(f=>f.type.startsWith('audio/')).forEach(f=>{
+    playlist.push({name:f.name.replace(/\.[^.]+$/,''), file:f, url:URL.createObjectURL(f)});
   });
-  document.getElementById('installBtn').addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') toast('App installed ✓');
-    deferredPrompt = null;
-    document.getElementById('installBanner').classList.remove('show');
-  });
-  document.getElementById('dismissBtn').addEventListener('click', () => {
-    document.getElementById('installBanner').classList.remove('show');
-  });
+  renderPlaylist();
+  if(playlist.length===files.length) loadTrack(0);
+  document.getElementById('playlistCard').style.display='block';
+  document.getElementById('nowPlaying').classList.add('show');
+  toast(`${files.length} file(s) added`);
+}
 
-  // ── TABS ──
-  function switchTab(name, btn) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('page-' + name).classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+function renderPlaylist(){
+  const pl=document.getElementById('playlist');
+  document.getElementById('plCount').textContent=playlist.length;
+  if(!playlist.length){pl.innerHTML='<div class="pl-empty">No files added</div>';return;}
+  pl.innerHTML=playlist.map((t,i)=>`
+    <div class="pl-item ${i===currentIndex?'active':''}" onclick="loadTrack(${i});togglePlay(true)">
+      <span class="pl-num">${i+1}</span>
+      <span class="pl-name">${t.name}</span>
+      <button class="pl-del" onclick="removeTrack(event,${i})">✕</button>
+    </div>`).join('');
+}
+
+function loadTrack(idx){
+  if(idx<0||idx>=playlist.length)return;
+  currentIndex=idx;
+  const t=playlist[idx];
+  audio.src=t.url;
+  document.getElementById('npTitle').textContent=t.name;
+  renderPlaylist();
+}
+
+function togglePlay(forcePlay){
+  if(!playlist.length)return;
+  if(forcePlay||audio.paused){ audio.play(); document.getElementById('playBtn').textContent='⏸'; }
+  else { audio.pause(); document.getElementById('playBtn').textContent='▶'; }
+}
+
+function prevTrack(){ loadTrack(currentIndex>0?currentIndex-1:playlist.length-1); if(!audio.paused)audio.play(); }
+function nextTrackAuto(){
+  if(repeatMode===1){ audio.currentTime=0; audio.play(); return; }
+  let next;
+  if(isShuffled){ const i=shuffleOrder.indexOf(currentIndex); next=shuffleOrder[(i+1)%shuffleOrder.length]; }
+  else { next=(currentIndex+1)%playlist.length; }
+  if(next===0&&repeatMode===0){ audio.pause(); document.getElementById('playBtn').textContent='▶'; return; }
+  loadTrack(next); audio.play();
+}
+function nextTrack(){ loadTrack(isShuffled?shuffleOrder[(shuffleOrder.indexOf(currentIndex)+1)%shuffleOrder.length]:(currentIndex+1)%playlist.length); if(!audio.paused)audio.play(); }
+
+function toggleShuffle(){
+  isShuffled=!isShuffled;
+  document.getElementById('btnShuffle').classList.toggle('active',isShuffled);
+  if(isShuffled){ shuffleOrder=[...Array(playlist.length).keys()].sort(()=>Math.random()-0.5); toast('Shuffle ON'); }
+  else toast('Shuffle OFF');
+}
+
+function toggleRepeat(){
+  repeatMode=(repeatMode+1)%3;
+  const btn=document.getElementById('btnRepeat');
+  const icons=['🔁','🔂','🔁'];
+  btn.textContent=icons[repeatMode];
+  btn.classList.toggle('active',repeatMode>0);
+  toast(['Repeat OFF','Repeat ONE','Repeat ALL'][repeatMode]);
+}
+
+function removeTrack(e,i){ e.stopPropagation(); URL.revokeObjectURL(playlist[i].url); playlist.splice(i,1); if(currentIndex>=playlist.length)currentIndex=Math.max(0,playlist.length-1); renderPlaylist(); toast('Removed'); }
+function clearPlaylist(){ playlist.forEach(t=>URL.revokeObjectURL(t.url)); playlist=[]; audio.pause(); audio.src=''; document.getElementById('playBtn').textContent='▶'; document.getElementById('npTitle').textContent='—'; document.getElementById('playlistCard').style.display='none'; document.getElementById('nowPlaying').classList.remove('show'); renderPlaylist(); }
+
+audio.addEventListener('ended', nextTrackAuto);
+audio.addEventListener('timeupdate', ()=>{
+  if(!audio.duration)return;
+  const pct=(audio.currentTime/audio.duration)*100;
+  const bar=document.getElementById('progressBar');
+  bar.value=pct; bar.style.setProperty('--prog',pct+'%');
+  document.getElementById('timeCurrent').textContent=fmt(audio.currentTime);
+  document.getElementById('npSub').textContent=fmt(audio.currentTime)+' / '+fmt(audio.duration);
+});
+audio.addEventListener('loadedmetadata', ()=>{ document.getElementById('timeDuration').textContent=fmt(audio.duration); document.getElementById('trimEnd').value=audio.duration.toFixed(1); updateTrimInfo(); });
+document.getElementById('progressBar').addEventListener('input', e=>{ if(audio.duration) audio.currentTime=(e.target.value/100)*audio.duration; });
+document.getElementById('volSlider').addEventListener('input', e=>audio.volume=e.target.value);
+function fmt(s){ const m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
+
+// ── EDITOR ──
+let editorFile=null, editorDuration=0, activeEffects=new Set();
+const editorFileInput=document.getElementById('editorFileInput');
+const editorUploadArea=document.getElementById('editorUploadArea');
+
+editorUploadArea.addEventListener('dragover',e=>{e.preventDefault();editorUploadArea.style.borderColor='var(--blue)';});
+editorUploadArea.addEventListener('dragleave',()=>editorUploadArea.style.borderColor='');
+editorUploadArea.addEventListener('drop',e=>{e.preventDefault();editorUploadArea.style.borderColor='';loadEditorFile(e.dataTransfer.files[0]);});
+editorFileInput.addEventListener('change',e=>loadEditorFile(e.target.files[0]));
+
+async function loadEditorFile(file){
+  if(!file||!file.type.startsWith('audio/'))return;
+  editorFile=file;
+  const url=URL.createObjectURL(file);
+  const edAudio=document.getElementById('editorAudio');
+  edAudio.src=url;
+  document.getElementById('editorPanel').style.display='block';
+  document.querySelector('.editor-upload strong').textContent=file.name;
+  toast('File loaded ✓');
+  // draw waveform
+  try{
+    const ctx=new AudioContext();
+    const buf=await file.arrayBuffer();
+    const decoded=await ctx.decodeAudioData(buf);
+    editorDuration=decoded.duration;
+    document.getElementById('trimEnd').value=editorDuration.toFixed(1);
+    updateTrimInfo();
+    drawWaveform(decoded);
+    ctx.close();
+  }catch(e){ console.warn('Waveform error',e); }
+}
+
+function drawWaveform(decoded){
+  const canvas=document.getElementById('waveCanvas');
+  const wrap=document.getElementById('waveformWrap');
+  canvas.width=wrap.offsetWidth; canvas.height=80;
+  const ctx=canvas.getContext('2d');
+  const data=decoded.getChannelData(0);
+  const step=Math.ceil(data.length/canvas.width);
+  const h=canvas.height;
+  ctx.fillStyle='#f0f4ff'; ctx.fillRect(0,0,canvas.width,h);
+  ctx.strokeStyle='var(--blue)'; ctx.lineWidth=1;
+  for(let i=0;i<canvas.width;i++){
+    let max=0;
+    for(let j=0;j<step;j++){const v=Math.abs(data[i*step+j]||0);if(v>max)max=v;}
+    const y=(1-max)*h/2;
+    ctx.beginPath(); ctx.moveTo(i,y); ctx.lineTo(i,h-y); ctx.stroke();
   }
+}
 
-  // ── Pills ──
-  document.querySelectorAll('.pill').forEach(p => {
-    p.addEventListener('click', () => {
-      document.getElementById('fmtSel').value = p.dataset.v;
-      syncPills();
-    });
-  });
-  function syncPills() {
-    const v = document.getElementById('fmtSel').value;
-    document.querySelectorAll('.pill').forEach(p => p.classList.toggle('on', p.dataset.v === v));
-  }
+function toggleEffect(el){ el.classList.toggle('on'); if(el.classList.contains('on'))activeEffects.add(el.dataset.e); else activeEffects.delete(el.dataset.e); }
 
-  // ── Paste ──
-  async function doPaste() {
-    try {
-      const t = await navigator.clipboard.readText();
-      document.getElementById('urlInput').value = t;
-      toast('Pasted ✓');
-    } catch {
-      toast('Clipboard permission required');
-    }
-  }
+function updateTrimInfo(){
+  const s=parseFloat(document.getElementById('trimStart').value)||0;
+  const e=parseFloat(document.getElementById('trimEnd').value)||0;
+  document.getElementById('trimStartLabel').textContent=s.toFixed(1)+'s';
+  document.getElementById('trimEndLabel').textContent=e.toFixed(1)+'s';
+  document.getElementById('trimDurLabel').textContent=Math.max(0,e-s).toFixed(1)+'s';
+}
 
-  // ── Generate ──
-  function generate() {
-    const url  = document.getElementById('urlInput').value.trim();
-    const fmt  = document.getElementById('fmtSel').value;
-    const qual = document.getElementById('qualSel').value;
+function previewTrim(){
+  const edAudio=document.getElementById('editorAudio');
+  const s=parseFloat(document.getElementById('trimStart').value)||0;
+  edAudio.currentTime=s; edAudio.play(); toast('Preview started');
+  const e=parseFloat(document.getElementById('trimEnd').value)||edAudio.duration;
+  const tid=setInterval(()=>{ if(edAudio.currentTime>=e){edAudio.pause();clearInterval(tid);} },200);
+}
 
-    if (!url) { toast('Enter a YouTube URL'); return; }
-    if (!url.includes('youtube') && !url.includes('youtu.be')) {
-      toast('Please enter a valid YouTube URL'); return;
-    }
+function generateEditCmd(){
+  if(!editorFile){toast('Load a file first');return;}
+  const s=parseFloat(document.getElementById('trimStart').value)||0;
+  const e=parseFloat(document.getElementById('trimEnd').value)||editorDuration;
+  const dur=e-s;
+  const name=editorFile.name.replace(/\.[^.]+$/,'');
+  let filters=[];
+  if(activeEffects.has('fadein')) filters.push(`afade=t=in:st=${s}:d=2`);
+  if(activeEffects.has('fadeout')) filters.push(`afade=t=out:st=${e-2}:d=2`);
+  if(activeEffects.has('normalize')) filters.push('loudnorm');
+  const filter=filters.length?`-af "${filters.join(',')}" `:'';
+  const cmd=`ffmpeg -i "input.mp3" -ss ${s} -t ${dur.toFixed(1)} ${filter}-c:a libmp3lame "${name}_edited.mp3"`;
+  const prev=document.getElementById('editorPreview');
+  prev.textContent=cmd; prev.classList.add('show');
+  cp(cmd,{textContent:'',classList:{add:()=>{},remove:()=>{}}}); 
+  toast('Command copied ✓');
+}
 
-    const cmd = `yt-dlp -x --audio-format ${fmt} --audio-quality ${qual}k "${url}"`;
-
-    document.getElementById('termBody').innerHTML = `
-      <div><span class="t-prompt">❯</span> <span class="t-cmd">${esc(cmd)}</span></div>
-      <div class="t-dim" style="margin-top:4px">[yt-dlp] Fetching metadata...</div>
-      <div class="t-dim">[download] 100% of ~4.20MiB at 3.20MiB/s</div>
-      <div class="t-dim">[ffmpeg] Extracting audio → .${fmt}</div>
-      <div class="t-ok" style="margin-top:6px">✔ Done → output.${fmt}</div>
-      <span class="cursor"></span>
-    `;
-    document.getElementById('finalCmd').textContent = cmd;
-
-    const out = document.getElementById('output');
-    out.classList.add('show');
-    setTimeout(() => out.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
-    toast('Command generated ✓');
-  }
-
-  function esc(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-  function cp(text, btn) {
-    navigator.clipboard.writeText(text).then(() => {
-      const orig = btn.textContent;
-      btn.textContent = '✓'; btn.classList.add('ok');
-      setTimeout(() => { btn.textContent = orig; btn.classList.remove('ok'); }, 1500);
-    });
-  }
-  function cpFinal(btn) { cp(document.getElementById('finalCmd').textContent, btn); }
-
-  function toast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    clearTimeout(t._tid);
-    t._tid = setTimeout(() => t.classList.remove('show'), 2200);
-  }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._tid); t._tid=setTimeout(()=>t.classList.remove('show'),2200); }
 </script>
 </body>
 </html>
