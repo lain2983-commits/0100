@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#ffffff"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="Extractor"/>
+  <link rel="manifest" href="manifest.json"/>
+  <title>Audio Extractor</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #ffffff;
+      --bg2:      #f4f6fb;
+      --surface:  #f8f9fd;
+      --border:   #e2e8f5;
+      --blue:     #1a6fff;
+      --blue2:    #0d47cc;
+      --bluesoft: #e8f0ff;
+      --text:     #0d1530;
+      --muted:    #7a8aaa;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      overflow-x: hidden;
+    }
+
+    /* subtle dot grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, #c8d8f0 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* top blue accent bar */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--blue2), var(--blue), #7eb8ff);
+      z-index: 100;
+    }
+
+    /* ── INSTALL BANNER ── */
+    #installBanner {
+      display: none;
+      position: fixed;
+      top: 3px; left: 0; right: 0;
+      z-index: 99;
+      background: var(--blue2);
+      color: #fff;
+      padding: calc(var(--safe-top) + 10px) 16px 10px;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      animation: slideDown 0.4s ease;
+    }
+    #installBanner.show { display: flex; }
+    @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+    #installBanner span { flex: 1; opacity: 0.9; }
+    .banner-btn {
+      background: #fff;
+      color: var(--blue2);
+      border: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 6px 14px;
+      cursor: pointer;
+    }
+    .banner-dismiss {
+      background: none; border: none; color: rgba(255,255,255,0.6);
+      font-size: 16px; cursor: pointer; padding: 0 4px;
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      position: sticky;
+      top: 3px;
+      z-index: 50;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      padding: calc(var(--safe-top) + 0px) 0 0;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 16px 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tab.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+
+    /* ── SCROLL BODY ── */
+    .scroll-body {
+      position: relative;
+      z-index: 1;
+      padding: 32px 20px calc(var(--safe-bot) + 48px);
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ── PAGES ── */
+    .page { display: none; }
+    .page.active { display: block; animation: fadeUp 0.3s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── HERO ── */
+    .hero { margin-bottom: 32px; }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.6rem, 12vw, 4rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      word-break: keep-all;
+    }
+
+    .hero h1 .accent {
+      display: block;
+      color: var(--blue);
+    }
+
+    .hero-sub {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      line-height: 1.7;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px 18px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--blue), transparent 60%);
+      opacity: 0.4;
+    }
+
+    .card-label {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    /* ── URL INPUT ── */
+    .url-wrap {
+      display: flex;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .url-wrap:focus-within {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26,111,255,0.1);
+    }
+    .url-wrap input {
+      flex: 1; min-width: 0;
+      background: transparent; border: none; outline: none;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 13px 14px;
+    }
+    .url-wrap input::placeholder { color: var(--muted); }
+    .paste-btn {
+      background: var(--bluesoft);
+      border: none; border-left: 1.5px solid var(--border);
+      color: var(--blue);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em;
+      padding: 0 16px; cursor: pointer;
+      transition: background 0.2s; white-space: nowrap;
+    }
+    .paste-btn:active { background: #d0e4ff; }
+
+    /* ── OPTIONS ── */
+    .opts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .opt-group label {
+      font-size: 9px; letter-spacing: 0.18em; color: var(--muted);
+      display: block; margin-bottom: 7px;
+    }
+    .opt-group select {
+      width: 100%;
+      background: #fff; border: 1.5px solid var(--border);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      padding: 10px 12px; outline: none; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a8aaa' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .opt-group select:focus { border-color: var(--blue); }
+
+    /* ── PILLS ── */
+    .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill {
+      font-size: 10px; letter-spacing: 0.1em;
+      padding: 5px 12px;
+      border: 1.5px solid var(--border); color: var(--muted);
+      cursor: pointer; transition: all 0.15s; user-select: none;
+      background: #fff;
+    }
+    .pill.on {
+      border-color: var(--blue); color: var(--blue);
+      background: var(--bluesoft);
+    }
+
+    /* ── GENERATE BTN ── */
+    .gen-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--blue), var(--blue2));
+      color: #fff; border: none;
+      font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 17px; cursor: pointer; margin-bottom: 12px;
+      transition: opacity 0.2s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 20px rgba(26,111,255,0.25);
+    }
+    .gen-btn:active { transform: scale(0.98); opacity: 0.9; }
+    .gen-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ── OUTPUT ── */
+    #output { display: none; }
+    #output.show { display: block; animation: fadeUp 0.3s ease; }
+
+    /* ── TERMINAL ── */
+    .terminal {
+      background: #0d1530; border: 1px solid #1a2545;
+      padding: 18px; font-size: 11px; line-height: 2; overflow-x: auto;
+    }
+    .term-header {
+      display: flex; gap: 6px; align-items: center;
+      margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px solid #1a2545;
+    }
+    .dot { width: 9px; height: 9px; border-radius: 50%; }
+    .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
+    .t-label { color: #4a5880; font-size: 10px; margin-left: 6px; }
+    .t-prompt { color: var(--blue); } .t-cmd { color: #c8d8ff; }
+    .t-ok { color: #4dffb0; } .t-dim { color: #2a3a5a; }
+
+    /* ── SNIPPET ── */
+    .isteps { display: flex; flex-direction: column; gap: 16px; }
+    .istep { display: flex; gap: 14px; align-items: flex-start; }
+    .istep-num {
+      font-size: 10px; color: var(--blue);
+      border: 1.5px solid var(--blue);
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+      background: var(--bluesoft);
+    }
+    .istep-body { flex: 1; }
+    .istep-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+    .snippet {
+      background: #f0f4ff; border: 1px solid var(--border);
+      border-left: 2px solid var(--blue);
+      padding: 10px 12px; font-size: 11px; color: var(--blue2);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; margin-bottom: 6px; overflow-x: auto;
+    }
+    .snippet code { white-space: nowrap; }
+    .copy-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'JetBrains Mono', monospace; font-size: 9px;
+      letter-spacing: 0.1em; padding: 4px 8px; cursor: pointer;
+      white-space: nowrap; flex-shrink: 0; transition: all 0.2s;
+    }
+    .copy-btn:active, .copy-btn.ok { color: #0d8a50; border-color: #0d8a50; }
+
+    /* ── USAGE PAGE ── */
+    .usage-step {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 20px 18px;
+      background: var(--surface); border: 1px solid var(--border);
+      margin-bottom: 10px; position: relative;
+    }
+    .usage-step::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--blue), transparent 60%);
+      opacity: 0.4;
+    }
+    .usage-num {
+      font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
+      color: var(--bluesoft); line-height: 1; flex-shrink: 0;
+      width: 36px; text-align: center;
+      -webkit-text-stroke: 1.5px var(--blue);
+    }
+    .usage-content { flex: 1; }
+    .usage-title {
+      font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+      margin-bottom: 6px; color: var(--text);
+    }
+    .usage-desc { font-size: 11px; color: var(--muted); line-height: 1.7; }
+    .usage-desc strong { color: var(--blue); font-weight: 500; }
+
+    .usage-note {
+      background: var(--bluesoft); border: 1px solid #c0d4ff;
+      padding: 14px 16px; margin-top: 10px;
+      font-size: 11px; color: var(--blue2); line-height: 1.7;
+    }
+    .usage-note strong { font-weight: 700; display: block; margin-bottom: 4px; }
+
+    /* ── COPYRIGHT ── */
+    .copyright-box {
+      background: #fff8f0; border: 1px solid #f0d0a0;
+      border-left: 3px solid #e07000;
+      padding: 16px; margin-top: 16px;
+      font-size: 11px; color: #7a5000; line-height: 1.8;
+    }
+    .copyright-box strong { display: block; font-size: 12px; color: #5a3800; margin-bottom: 6px; }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 36px; padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 8px;
+    }
+    .footer-credit { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; }
+    .footer-credit span { color: var(--blue); font-weight: 500; }
+    .footer-ver { font-size: 10px; color: var(--border); letter-spacing: 0.08em; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: calc(var(--safe-bot) + 24px); left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--blue2); color: #fff;
+      font-size: 11px; letter-spacing: 0.08em;
+      padding: 11px 22px; opacity: 0;
+      transition: all 0.3s; pointer-events: none;
+      z-index: 500; white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(13,71,204,0.3);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @keyframes blink { 50% { opacity: 0; } }
+    .cursor {
+      display: inline-block; width: 7px; height: 12px;
+      background: var(--blue); vertical-align: middle;
+      animation: blink 1s infinite; margin-left: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- INSTALL BANNER -->
+<div id="installBanner">
+  <span>📱 Install as app on your home screen</span>
+  <button class="banner-btn" id="installBtn">INSTALL</button>
+  <button class="banner-dismiss" id="dismissBtn">✕</button>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('extractor', this)">EXTRACTOR</button>
+  <button class="tab" onclick="switchTab('howto', this)">HOW TO USE</button>
+</div>
+
+<!-- MAIN -->
+<div class="scroll-body">
+
+  <!-- ── PAGE: EXTRACTOR ── -->
+  <div class="page active" id="page-extractor">
+
+    <div class="hero">
+      <h1>AUDIO<span class="accent">EXTRACTOR</span></h1>
+      <p class="hero-sub">Paste a YouTube URL → Generate command → Run in terminal</p>
+    </div>
+
+    <!-- URL -->
+    <div class="card">
+      <div class="card-label">01 — Source URL</div>
+      <div class="url-wrap">
+        <input type="url" id="urlInput" inputmode="url" placeholder="https://youtu.be/..."/>
+        <button class="paste-btn" onclick="doPaste()">PASTE</button>
+      </div>
+    </div>
+
+    <!-- OPTIONS -->
+    <div class="card">
+      <div class="card-label">02 — Output Settings</div>
+      <div class="opts-row">
+        <div class="opt-group">
+          <label>Format</label>
+          <select id="fmtSel" onchange="syncPills()">
+            <option value="mp3">MP3</option>
+            <option value="m4a">M4A</option>
+            <option value="wav">WAV</option>
+            <option value="flac">FLAC</option>
+            <option value="aac">AAC</option>
+            <option value="opus">OPUS</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label>Quality</label>
+          <select id="qualSel">
+            <option value="128">128 kbps</option>
+            <option value="192" selected>192 kbps</option>
+            <option value="256">256 kbps</option>
+            <option value="320">320 kbps ★</option>
+          </select>
+        </div>
+      </div>
+      <div class="pills" id="pills">
+        <div class="pill on" data-v="mp3">MP3</div>
+        <div class="pill" data-v="m4a">M4A</div>
+        <div class="pill" data-v="wav">WAV</div>
+        <div class="pill" data-v="flac">FLAC</div>
+        <div class="pill" data-v="aac">AAC</div>
+        <div class="pill" data-v="opus">OPUS</div>
+      </div>
+    </div>
+
+    <!-- GENERATE -->
+    <button class="gen-btn" onclick="generate()">▶ &nbsp;GENERATE COMMAND</button>
+
+    <!-- OUTPUT -->
+    <div id="output">
+      <div class="card">
+        <div class="card-label">03 — Command Output</div>
+        <div class="terminal">
+          <div class="term-header">
+            <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+            <span class="t-label">bash — terminal</span>
+          </div>
+          <div id="termBody"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Setup Guide</div>
+        <div class="isteps">
+          <div class="istep">
+            <div class="istep-num">1</div>
+            <div class="istep-body">
+              <div class="istep-title">Install yt-dlp</div>
+              <div class="snippet"><code>pip install yt-dlp</code><button class="copy-btn" onclick="cp('pip install yt-dlp',this)">COPY</button></div>
+            </div>
+          </div>
+          <div class="istep">
+            <div class="istep-num">2</div>
+            <div class="istep-body">
+              <div class="istep-title">Install ffmpeg</div>
+              <div class="snippet"><code>brew install ffmpeg</code><button class="copy-btn" onclick="cp('brew install ffmpeg',this)">macOS</button></div>
+              <div class="snippet"><code>sudo apt install ffmpeg</code><button class="copy-btn" onclick="cp('sudo apt install ffmpeg',this)">Ubuntu</button></div>
+              <div class="snippet"><code>winget install ffmpeg</code><button class="copy-btn" onclick="cp('winget install ffmpeg',this)">Windows</button></div>
+            </div>
+          </div>
+          <div class="istep">
+            <div class="istep-num">3</div>
+            <div class="istep-body">
+              <div class="istep-title">Run the command</div>
+              <div class="snippet">
+                <code id="finalCmd" style="color:var(--blue2)">Generate a command first ↑</code>
+                <button class="copy-btn" id="finalCopy" onclick="cpFinal(this)">COPY</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COPYRIGHT -->
+    <div class="copyright-box">
+      <strong>⚠ 저작권 안내 / Copyright Notice</strong>
+      본 도구는 개인적, 비상업적 용도로만 사용하세요.<br/>
+      저작권이 있는 콘텐츠의 무단 다운로드 및 배포는 저작권법에 위반될 수 있습니다.<br/>
+      상업적 이용 및 무단 재배포를 금지합니다.<br/>
+      <br/>
+      This tool is for personal, non-commercial use only.<br/>
+      Unauthorized downloading or redistribution of copyrighted content may violate applicable laws.
+    </div>
+
+    <div class="footer">
+      <div class="footer-credit">MADE BY <span>추인엽</span></div>
+      <div class="footer-ver">v3.0 · PWA</div>
+    </div>
+
+  </div>
+
+  <!-- ── PAGE: HOW TO USE ── -->
+  <div class="page" id="page-howto">
+
+    <div class="hero">
+      <h1>HOW TO<span class="accent">USE</span></h1>
+      <p class="hero-sub">Step-by-step guide to extract audio from YouTube</p>
+    </div>
+
+    <div class="usage-step">
+      <div class="usage-num">1</div>
+      <div class="usage-content">
+        <div class="usage-title">Copy YouTube URL</div>
+        <div class="usage-desc">
+          YouTube에서 원하는 영상을 열고<br/>
+          주소창의 URL을 복사하세요.<br/>
+          <strong>예: https://youtu.be/XXXXXXX</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="usage-step">
+      <div class="usage-num">2</div>
+      <div class="usage-content">
+        <div class="usage-title">Paste & Set Options</div>
+        <div class="usage-desc">
+          EXTRACTOR 탭으로 이동 후<br/>
+          <strong>PASTE</strong> 버튼을 눌러 URL을 붙여넣고<br/>
+          원하는 <strong>형식(MP3 등)</strong>과 <strong>품질</strong>을 선택하세요.
+        </div>
+      </div>
+    </div>
+
+    <div class="usage-step">
+      <div class="usage-num">3</div>
+      <div class="usage-content">
+        <div class="usage-title">Generate Command</div>
+        <div class="usage-desc">
+          <strong>GENERATE COMMAND</strong> 버튼을 누르면<br/>
+          터미널에서 실행할 커맨드가 자동 생성됩니다.
+        </div>
+      </div>
+    </div>
+
+    <div class="usage-step">
+      <div class="usage-num">4</div>
+      <div class="usage-content">
+        <div class="usage-title">Install Dependencies</div>
+        <div class="usage-desc">
+          처음 사용 시 아래 패키지를 먼저 설치하세요.<br/>
+          <strong>yt-dlp</strong> — 유튜브 다운로더<br/>
+          <strong>ffmpeg</strong> — 오디오 변환 엔진
+        </div>
+      </div>
+    </div>
+
+    <div class="usage-step">
+      <div class="usage-num">5</div>
+      <div class="usage-content">
+        <div class="usage-title">Run in Terminal</div>
+        <div class="usage-desc">
+          생성된 커맨드를 <strong>COPY</strong> 후<br/>
+          PC의 터미널(macOS: Terminal, Windows: CMD 또는 PowerShell)에 붙여넣고 실행하면<br/>
+          현재 폴더에 음원 파일이 저장됩니다.
+        </div>
+      </div>
+    </div>
+
+    <div class="usage-note">
+      <strong>💡 지원 형식 안내</strong>
+      MP3 — 가장 범용적, 스트리밍 추천<br/>
+      WAV — 무손실, 용량 큼<br/>
+      FLAC — 무손실 압축, 음질 최우선<br/>
+      M4A / AAC / OPUS — 모바일 최적화
+    </div>
+
+    <div class="copyright-box">
+      <strong>⚠ 저작권 안내 / Copyright Notice</strong>
+      본 도구는 개인적, 비상업적 용도로만 사용하세요.<br/>
+      저작권이 있는 콘텐츠의 무단 다운로드 및 배포는 저작권법에 위반될 수 있습니다.<br/>
+      상업적 이용 및 무단 재배포를 금지합니다.
+    </div>
+
+    <div class="footer">
+      <div class="footer-credit">MADE BY <span>추인엽</span></div>
+      <div class="footer-ver">v3.0 · PWA</div>
+    </div>
+
+  </div>
+
+</div><!-- /scroll-body -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── PWA ──
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBanner').classList.add('show');
+  });
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') toast('App installed ✓');
+    deferredPrompt = null;
+    document.getElementById('installBanner').classList.remove('show');
+  });
+  document.getElementById('dismissBtn').addEventListener('click', () => {
+    document.getElementById('installBanner').classList.remove('show');
+  });
+
+  // ── TABS ──
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-' + name).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── Pills ──
+  document.querySelectorAll('.pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.getElementById('fmtSel').value = p.dataset.v;
+      syncPills();
+    });
+  });
+  function syncPills() {
+    const v = document.getElementById('fmtSel').value;
+    document.querySelectorAll('.pill').forEach(p => p.classList.toggle('on', p.dataset.v === v));
+  }
+
+  // ── Paste ──
+  async function doPaste() {
+    try {
+      const t = await navigator.clipboard.readText();
+      document.getElementById('urlInput').value = t;
+      toast('Pasted ✓');
+    } catch {
+      toast('Clipboard permission required');
+    }
+  }
+
+  // ── Generate ──
+  function generate() {
+    const url  = document.getElementById('urlInput').value.trim();
+    const fmt  = document.getElementById('fmtSel').value;
+    const qual = document.getElementById('qualSel').value;
+
+    if (!url) { toast('Enter a YouTube URL'); return; }
+    if (!url.includes('youtube') && !url.includes('youtu.be')) {
+      toast('Please enter a valid YouTube URL'); return;
+    }
+
+    const cmd = `yt-dlp -x --audio-format ${fmt} --audio-quality ${qual}k "${url}"`;
+
+    document.getElementById('termBody').innerHTML = `
+      <div><span class="t-prompt">❯</span> <span class="t-cmd">${esc(cmd)}</span></div>
+      <div class="t-dim" style="margin-top:4px">[yt-dlp] Fetching metadata...</div>
+      <div class="t-dim">[download] 100% of ~4.20MiB at 3.20MiB/s</div>
+      <div class="t-dim">[ffmpeg] Extracting audio → .${fmt}</div>
+      <div class="t-ok" style="margin-top:6px">✔ Done → output.${fmt}</div>
+      <span class="cursor"></span>
+    `;
+    document.getElementById('finalCmd').textContent = cmd;
+
+    const out = document.getElementById('output');
+    out.classList.add('show');
+    setTimeout(() => out.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    toast('Command generated ✓');
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function cp(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓'; btn.classList.add('ok');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('ok'); }, 1500);
+    });
+  }
+  function cpFinal(btn) { cp(document.getElementById('finalCmd').textContent, btn); }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._tid);
+    t._tid = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+</script>
+</body>
+</html>
