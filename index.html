@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#050a18"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Extractor"/>
+  <meta name="description" content="YouTube Audio Extractor"/>
+  <link rel="manifest" href="manifest.json"/>
+  <title>Audio Extractor</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #050a18;
+      --bg2:      #080f22;
+      --surface:  #0d1530;
+      --border:   #1a2545;
+      --blue:     #4d9fff;
+      --blue2:    #1a6fff;
+      --glow:     rgba(77,159,255,0.15);
+      --text:     #e8eeff;
+      --muted:    #4a5880;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      overflow-x: hidden;
+    }
+
+    /* ── ANIMATED BG ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(29,80,180,0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 80% 80%, rgba(20,50,140,0.15) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(77,159,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(77,159,255,0.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── INSTALL BANNER ── */
+    #installBanner {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      background: linear-gradient(90deg, #1a3a7a, #0d2255);
+      border-bottom: 1px solid var(--blue2);
+      color: var(--text);
+      padding: calc(var(--safe-top) + 12px) 16px 12px;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      animation: slideDown 0.4s ease;
+    }
+
+    #installBanner.show { display: flex; }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); }
+      to   { transform: translateY(0); }
+    }
+
+    #installBanner span { flex: 1; color: #a0beff; }
+
+    .banner-btn {
+      background: var(--blue);
+      color: #050a18;
+      border: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      padding: 7px 14px;
+      cursor: pointer;
+    }
+
+    .banner-dismiss {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    /* ── SCROLL BODY ── */
+    .scroll-body {
+      position: relative;
+      z-index: 1;
+      padding: calc(var(--safe-top) + 48px) 20px calc(var(--safe-bot) + 60px);
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      margin-bottom: 40px;
+      padding-top: 8px;
+    }
+
+    .hero-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--blue);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-eyebrow::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--blue2), transparent);
+      max-width: 80px;
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.4rem, 11vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .hero h1 .accent {
+      display: block;
+      background: linear-gradient(120deg, var(--blue) 0%, #7eb8ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      line-height: 1.6;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 22px 18px;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--blue2), transparent 60%);
+    }
+
+    .card-label {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    /* ── URL INPUT ── */
+    .url-wrap {
+      display: flex;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 0;
+    }
+
+    .url-wrap:focus-within {
+      border-color: var(--blue2);
+      box-shadow: 0 0 0 3px rgba(29,111,255,0.12);
+    }
+
+    .url-wrap input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 14px 14px;
+    }
+
+    .url-wrap input::placeholder { color: var(--muted); }
+
+    .paste-btn {
+      background: rgba(77,159,255,0.1);
+      border: none;
+      border-left: 1px solid var(--border);
+      color: var(--blue);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      padding: 0 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .paste-btn:active { background: rgba(77,159,255,0.2); }
+
+    /* ── OPTIONS ── */
+    .opts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .opt-group label {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .opt-group select {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 10px 12px;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%234a5880' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .opt-group select:focus { border-color: var(--blue2); }
+
+    /* ── FORMAT PILLS ── */
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+      background: var(--bg2);
+    }
+
+    .pill.on {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: rgba(77,159,255,0.08);
+      box-shadow: 0 0 12px rgba(77,159,255,0.1);
+    }
+
+    /* ── GENERATE BTN ── */
+    .gen-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #1a6fff, #0d47cc);
+      color: #fff;
+      border: none;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 18px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 0.2s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .gen-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
+    }
+
+    .gen-btn:active { transform: scale(0.98); opacity: 0.9; }
+    .gen-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ── OUTPUT ── */
+    #output { display: none; }
+    #output.show { display: block; animation: fadeUp 0.35s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── TERMINAL ── */
+    .terminal {
+      background: #02060f;
+      border: 1px solid var(--border);
+      padding: 18px;
+      font-size: 11px;
+      line-height: 2;
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .terminal::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--blue2), transparent 50%);
+    }
+
+    .term-header {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dot { width: 9px; height: 9px; border-radius: 50%; }
+    .dot.r { background: #ff5f57; }
+    .dot.y { background: #febc2e; }
+    .dot.g { background: #28c840; }
+    .t-label { color: var(--muted); font-size: 10px; margin-left: 6px; }
+
+    .t-prompt { color: var(--blue); }
+    .t-cmd    { color: #c8d8ff; }
+    .t-ok     { color: #4dffb0; }
+    .t-dim    { color: #2a3a5a; }
+
+    /* ── INSTALL STEPS ── */
+    .isteps { display: flex; flex-direction: column; gap: 16px; }
+
+    .istep { display: flex; gap: 14px; align-items: flex-start; }
+
+    .istep-num {
+      font-size: 10px;
+      color: var(--blue);
+      border: 1px solid var(--blue2);
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+      background: rgba(77,159,255,0.05);
+    }
+
+    .istep-body { flex: 1; }
+
+    .istep-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .snippet {
+      background: #02060f;
+      border: 1px solid var(--border);
+      border-left: 2px solid var(--blue2);
+      padding: 10px 12px;
+      font-size: 11px;
+      color: #a0beff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      overflow-x: auto;
+    }
+
+    .snippet code { white-space: nowrap; }
+
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      padding: 4px 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:active, .copy-btn.ok {
+      color: #4dffb0;
+      border-color: #4dffb0;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-credit {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+    }
+
+    .footer-credit span { color: var(--blue); }
+
+    .footer-ver {
+      font-size: 10px;
+      color: var(--border);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: calc(var(--safe-bot) + 24px);
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--surface);
+      border: 1px solid var(--blue2);
+      color: var(--blue);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      padding: 11px 22px;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 500;
+      white-space: nowrap;
+      box-shadow: 0 0 20px rgba(29,111,255,0.2);
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @keyframes blink { 50% { opacity: 0; } }
+    .cursor {
+      display: inline-block;
+      width: 7px; height: 13px;
+      background: var(--blue);
+      vertical-align: middle;
+      animation: blink 1s infinite;
+      margin-left: 2px;
+    }
+
+    /* ── SCAN LINE EFFECT ── */
+    @keyframes scan {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+
+    .scanline {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(transparent, rgba(77,159,255,0.06), transparent);
+      animation: scan 8s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<!-- INSTALL BANNER -->
+<div id="installBanner">
+  <span>📱 Install as app on your home screen</span>
+  <button class="banner-btn" id="installBtn">INSTALL</button>
+  <button class="banner-dismiss" id="dismissBtn">✕</button>
+</div>
+
+<!-- MAIN -->
+<div class="scroll-body">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">YT · AUDIO · PWA</div>
+    <h1>AUDIO<span class="accent">EXTRACTOR</span></h1>
+    <p class="hero-sub">Paste a YouTube URL → Generate command → Run in terminal</p>
+  </div>
+
+  <!-- URL -->
+  <div class="card">
+    <div class="card-label">01 — Source URL</div>
+    <div class="url-wrap">
+      <input type="url" id="urlInput" inputmode="url" placeholder="https://youtu.be/..."/>
+      <button class="paste-btn" onclick="doPaste()">PASTE</button>
+    </div>
+  </div>
+
+  <!-- OPTIONS -->
+  <div class="card">
+    <div class="card-label">02 — Output Settings</div>
+    <div class="opts-row">
+      <div class="opt-group">
+        <label>Format</label>
+        <select id="fmtSel" onchange="syncPills()">
+          <option value="mp3">MP3</option>
+          <option value="m4a">M4A</option>
+          <option value="wav">WAV</option>
+          <option value="flac">FLAC</option>
+          <option value="aac">AAC</option>
+          <option value="opus">OPUS</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <label>Quality</label>
+        <select id="qualSel">
+          <option value="128">128 kbps</option>
+          <option value="192" selected>192 kbps</option>
+          <option value="256">256 kbps</option>
+          <option value="320">320 kbps ★</option>
+        </select>
+      </div>
+    </div>
+    <div class="pills" id="pills">
+      <div class="pill on" data-v="mp3">MP3</div>
+      <div class="pill" data-v="m4a">M4A</div>
+      <div class="pill" data-v="wav">WAV</div>
+      <div class="pill" data-v="flac">FLAC</div>
+      <div class="pill" data-v="aac">AAC</div>
+      <div class="pill" data-v="opus">OPUS</div>
+    </div>
+  </div>
+
+  <!-- GENERATE -->
+  <button class="gen-btn" onclick="generate()">▶ &nbsp;GENERATE COMMAND</button>
+
+  <!-- OUTPUT -->
+  <div id="output">
+
+    <div class="card">
+      <div class="card-label">03 — Command Output</div>
+      <div class="terminal">
+        <div class="term-header">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <span class="t-label">bash — zsh</span>
+        </div>
+        <div id="termBody"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Setup Guide</div>
+      <div class="isteps">
+
+        <div class="istep">
+          <div class="istep-num">1</div>
+          <div class="istep-body">
+            <div class="istep-title">Install yt-dlp</div>
+            <div class="snippet">
+              <code>pip install yt-dlp</code>
+              <button class="copy-btn" onclick="cp('pip install yt-dlp',this)">COPY</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="istep">
+          <div class="istep-num">2</div>
+          <div class="istep-body">
+            <div class="istep-title">Install ffmpeg</div>
+            <div class="snippet"><code>brew install ffmpeg</code><button class="copy-btn" onclick="cp('brew install ffmpeg',this)">macOS</button></div>
+            <div class="snippet"><code>sudo apt install ffmpeg</code><button class="copy-btn" onclick="cp('sudo apt install ffmpeg',this)">Ubuntu</button></div>
+            <div class="snippet"><code>winget install ffmpeg</code><button class="copy-btn" onclick="cp('winget install ffmpeg',this)">Windows</button></div>
+          </div>
+        </div>
+
+        <div class="istep">
+          <div class="istep-num">3</div>
+          <div class="istep-body">
+            <div class="istep-title">Run the command</div>
+            <div class="snippet">
+              <code id="finalCmd" style="color:var(--blue)">—</code>
+              <button class="copy-btn" id="finalCopy" onclick="cpFinal(this)">COPY</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-credit">MADE BY <span>CHOO</span></div>
+    <div class="footer-ver">PWA · v2.0</div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── PWA ──
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBanner').classList.add('show');
+  });
+
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') toast('App installed ✓');
+    deferredPrompt = null;
+    document.getElementById('installBanner').classList.remove('show');
+  });
+
+  document.getElementById('dismissBtn').addEventListener('click', () => {
+    document.getElementById('installBanner').classList.remove('show');
+  });
+
+  // ── Pills ──
+  document.querySelectorAll('.pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.getElementById('fmtSel').value = p.dataset.v;
+      syncPills();
+    });
+  });
+
+  function syncPills() {
+    const v = document.getElementById('fmtSel').value;
+    document.querySelectorAll('.pill').forEach(p => p.classList.toggle('on', p.dataset.v === v));
+  }
+
+  // ── Paste ──
+  async function doPaste() {
+    try {
+      const t = await navigator.clipboard.readText();
+      document.getElementById('urlInput').value = t;
+      toast('Pasted ✓');
+    } catch {
+      toast('Clipboard permission required');
+    }
+  }
+
+  // ── Generate ──
+  function generate() {
+    const url  = document.getElementById('urlInput').value.trim();
+    const fmt  = document.getElementById('fmtSel').value;
+    const qual = document.getElementById('qualSel').value;
+
+    if (!url) { toast('Enter a YouTube URL'); return; }
+    if (!url.includes('youtube') && !url.includes('youtu.be')) {
+      toast('Please enter a valid YouTube URL'); return;
+    }
+
+    const cmd = `yt-dlp -x --audio-format ${fmt} --audio-quality ${qual}k "${url}"`;
+
+    document.getElementById('termBody').innerHTML = `
+      <div><span class="t-prompt">❯</span> <span class="t-cmd">${esc(cmd)}</span></div>
+      <div class="t-dim" style="margin-top:4px">[yt-dlp] Fetching metadata...</div>
+      <div class="t-dim">[download] 100% of ~4.20MiB at 3.20MiB/s</div>
+      <div class="t-dim">[ffmpeg] Extracting audio → .${fmt}</div>
+      <div class="t-ok" style="margin-top:6px">✔ Done → output.${fmt}</div>
+      <span class="cursor"></span>
+    `;
+
+    document.getElementById('finalCmd').textContent = cmd;
+
+    const out = document.getElementById('output');
+    out.classList.add('show');
+    setTimeout(() => out.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    toast('Command generated ✓');
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function cp(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓';
+      btn.classList.add('ok');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('ok'); }, 1500);
+    });
+  }
+
+  function cpFinal(btn) { cp(document.getElementById('finalCmd').textContent, btn); }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._tid);
+    t._tid = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+</script>
+</body>
+</html>
