@@ -16,73 +16,67 @@
     :root {
       --bg: #ffffff; --bg2: #f4f6fb; --surface: #f8f9fd;
       --border: #e2e8f5; --blue: #1a6fff; --blue2: #0d47cc;
-      --bluesoft: #e8f0ff; --text: #0d1530; --muted: #7a8aaa;
+      --bluesoft: #e8f0ff; --text: #0d1530; --muted: #0d1530;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bot: env(safe-area-inset-bottom, 0px);
     }
     html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; overflow-x: hidden; }
-    body::before {
-      content: ''; position: fixed; inset: 0;
-      background-image: radial-gradient(circle, #c8d8f0 1px, transparent 1px);
-      background-size: 28px 28px; opacity: 0.5; pointer-events: none; z-index: 0;
-    }
-    body::after {
-      content: ''; position: fixed; top: 0; left: 0; right: 0; height: 3px;
-      background: linear-gradient(90deg, var(--blue2), var(--blue), #7eb8ff); z-index: 100;
-    }
+    body::before { content: ''; position: fixed; inset: 0; background-image: radial-gradient(circle, #c8d8f0 1px, transparent 1px); background-size: 28px 28px; opacity: 0.4; pointer-events: none; z-index: 0; }
+    body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--blue2), var(--blue), #7eb8ff); z-index: 100; }
 
     /* INSTALL BANNER */
     #installBanner { display: none; position: fixed; top: 3px; left: 0; right: 0; z-index: 99; background: var(--blue2); color: #fff; padding: calc(var(--safe-top) + 10px) 16px 10px; align-items: center; gap: 12px; font-size: 12px; }
     #installBanner.show { display: flex; }
-    #installBanner span { flex: 1; opacity: 0.9; }
+    #installBanner span { flex: 1; }
     .banner-btn { background: #fff; color: var(--blue2); border: none; font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 6px 14px; cursor: pointer; }
-    .banner-dismiss { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 16px; cursor: pointer; }
+    .banner-dismiss { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 16px; cursor: pointer; }
 
     /* TABS */
-    .tabs { position: sticky; top: 3px; z-index: 50; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); display: flex; }
-    .tab { flex: 1; padding: 14px 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+    .tabs { position: sticky; top: 3px; z-index: 50; background: rgba(255,255,255,0.96); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); display: flex; }
+    .tab { flex: 1; padding: 14px 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #444; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
     .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
 
-    /* SCROLL BODY */
-    .scroll-body { position: relative; z-index: 1; padding: 28px 18px calc(var(--safe-bot) + 48px); max-width: 560px; margin: 0 auto; }
+    /* BODY */
+    .scroll-body { position: relative; z-index: 1; padding: 24px 18px calc(var(--safe-bot) + 40px); max-width: 560px; margin: 0 auto; }
     .page { display: none; }
     .page.active { display: block; animation: fadeUp 0.3s ease; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* HERO - fixed title */
-    .hero { margin-bottom: 28px; }
-    .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 10vw, 3.4rem); font-weight: 800; line-height: 1; letter-spacing: -0.02em; color: var(--text); word-break: break-word; overflow-wrap: break-word; }
-    .hero h1 .accent { display: block; color: var(--blue); }
-    .hero-sub { margin-top: 12px; font-size: 11px; color: var(--muted); line-height: 1.7; }
+    /* HERO — fixed single line */
+    .hero { margin-bottom: 24px; }
+    .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(1.6rem, 7.5vw, 2.6rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; color: var(--text); white-space: nowrap; }
+    .hero h1 .accent { color: var(--blue); }
+    .hero-sub { margin-top: 8px; font-size: 11px; color: #333; line-height: 1.6; }
 
     /* CARD */
-    .card { background: var(--surface); border: 1px solid var(--border); padding: 20px 16px; margin-bottom: 10px; position: relative; }
-    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--blue), transparent 60%); opacity: 0.4; }
-    .card-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+    .card { background: var(--surface); border: 1px solid var(--border); padding: 18px 16px; margin-bottom: 10px; position: relative; }
+    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--blue), transparent 60%); opacity: 0.5; }
+    .card-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #222; margin-bottom: 12px; font-weight: 600; }
 
     /* URL INPUT */
     .url-wrap { display: flex; border: 1.5px solid var(--border); background: #fff; transition: border-color 0.2s, box-shadow 0.2s; }
     .url-wrap:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,111,255,0.1); }
-    .url-wrap input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 12px 12px; }
-    .url-wrap input::placeholder { color: var(--muted); }
-    .paste-btn { background: var(--bluesoft); border: none; border-left: 1.5px solid var(--border); color: var(--blue); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; padding: 0 14px; cursor: pointer; white-space: nowrap; }
+    .url-wrap input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 12px; }
+    .url-wrap input::placeholder { color: #888; }
+    .paste-btn { background: var(--bluesoft); border: none; border-left: 1.5px solid var(--border); color: var(--blue); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; padding: 0 14px; cursor: pointer; white-space: nowrap; font-weight: 600; }
 
     /* OPTIONS */
     .opts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-    .opt-group label { font-size: 9px; letter-spacing: 0.18em; color: var(--muted); display: block; margin-bottom: 6px; }
-    .opt-group select { width: 100%; background: #fff; border: 1.5px solid var(--border); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 9px 10px; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a8aaa' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; cursor: pointer; }
+    .opt-group label { font-size: 9px; letter-spacing: 0.18em; color: #222; display: block; margin-bottom: 6px; font-weight: 600; }
+    .opt-group select { width: 100%; background: #fff; border: 1.5px solid var(--border); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 9px 10px; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23333' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; cursor: pointer; }
     .opt-group select:focus { border-color: var(--blue); }
 
     /* PILLS */
     .pills { display: flex; flex-wrap: wrap; gap: 6px; }
-    .pill { font-size: 10px; letter-spacing: 0.1em; padding: 4px 10px; border: 1.5px solid var(--border); color: var(--muted); cursor: pointer; transition: all 0.15s; user-select: none; background: #fff; }
+    .pill { font-size: 10px; letter-spacing: 0.1em; padding: 4px 10px; border: 1.5px solid var(--border); color: #333; cursor: pointer; transition: all 0.15s; user-select: none; background: #fff; }
     .pill.on { border-color: var(--blue); color: var(--blue); background: var(--bluesoft); }
 
-    /* BUTTONS */
-    .gen-btn { width: 100%; background: linear-gradient(135deg, var(--blue), var(--blue2)); color: #fff; border: none; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; padding: 16px; cursor: pointer; margin-bottom: 10px; box-shadow: 0 4px 20px rgba(26,111,255,0.25); -webkit-tap-highlight-color: transparent; transition: opacity 0.2s, transform 0.1s; }
+    /* GEN BTN */
+    .gen-btn { width: 100%; background: linear-gradient(135deg, var(--blue), var(--blue2)); color: #fff; border: none; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; padding: 15px; cursor: pointer; margin-bottom: 10px; box-shadow: 0 4px 20px rgba(26,111,255,0.25); -webkit-tap-highlight-color: transparent; transition: opacity 0.2s, transform 0.1s; }
     .gen-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+    /* BTN */
     .btn { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--border); background: #fff; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 9px 14px; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
-    .btn:active { background: var(--bg2); }
     .btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
     .btn.danger { border-color: #ffccd0; color: #cc2233; }
     .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
@@ -92,134 +86,145 @@
     #output.show { display: block; animation: fadeUp 0.3s ease; }
 
     /* TERMINAL */
-    .terminal { background: #0d1530; border: 1px solid #1a2545; padding: 16px; font-size: 11px; line-height: 2; overflow-x: auto; }
-    .term-header { display: flex; gap: 6px; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #1a2545; }
+    .terminal { background: #0d1530; border: 1px solid #1a2545; padding: 14px; font-size: 11px; line-height: 1.9; overflow-x: auto; }
+    .term-header { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #1a2545; }
     .dot { width: 9px; height: 9px; border-radius: 50%; }
-    .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
-    .t-label { color: #4a5880; font-size: 10px; margin-left: 6px; }
-    .t-prompt { color: var(--blue); } .t-cmd { color: #c8d8ff; } .t-ok { color: #4dffb0; } .t-dim { color: #2a3a5a; }
+    .dot.r{background:#ff5f57;}.dot.y{background:#febc2e;}.dot.g{background:#28c840;}
+    .t-label { color: #8898bb; font-size: 10px; margin-left: 6px; }
+    .t-prompt{color:var(--blue);}.t-cmd{color:#c8d8ff;}.t-ok{color:#4dffb0;}.t-dim{color:#3a4a6a;}
 
     /* SNIPPET */
-    .isteps { display: flex; flex-direction: column; gap: 14px; }
+    .isteps { display: flex; flex-direction: column; gap: 12px; }
     .istep { display: flex; gap: 12px; align-items: flex-start; }
     .istep-num { font-size: 10px; color: var(--blue); border: 1.5px solid var(--blue); width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; background: var(--bluesoft); }
-    .istep-body { flex: 1; }
-    .istep-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
-    .snippet { background: #f0f4ff; border: 1px solid var(--border); border-left: 2px solid var(--blue); padding: 9px 10px; font-size: 11px; color: var(--blue2); display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; overflow-x: auto; }
+    .istep-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 7px; color: var(--text); }
+    .snippet { background: #f0f4ff; border: 1px solid var(--border); border-left: 2px solid var(--blue); padding: 8px 10px; font-size: 11px; color: var(--blue2); display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 5px; overflow-x: auto; }
     .snippet code { white-space: nowrap; }
-    .copy-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; padding: 3px 7px; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.2s; }
+    .copy-btn { background: none; border: 1px solid var(--border); color: #333; font-family: 'JetBrains Mono', monospace; font-size: 9px; padding: 3px 7px; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.2s; }
     .copy-btn.ok { color: #0d8a50; border-color: #0d8a50; }
 
-    /* ── PLAYER ── */
-    .player-upload { border: 2px dashed var(--border); padding: 32px 20px; text-align: center; cursor: pointer; transition: border-color 0.2s; background: #fff; }
-    .player-upload:hover, .player-upload.drag { border-color: var(--blue); background: var(--bluesoft); }
+    /* ══ PLAYER ══ */
+    .player-upload { border: 2px dashed var(--border); padding: 28px 20px; text-align: center; cursor: pointer; background: #fff; transition: border-color 0.2s; }
+    .player-upload:hover,.player-upload.drag { border-color: var(--blue); background: var(--bluesoft); }
     .player-upload input { display: none; }
-    .upload-icon { font-size: 32px; margin-bottom: 8px; }
-    .upload-text { font-size: 12px; color: var(--muted); }
-    .upload-text strong { color: var(--blue); display: block; font-size: 13px; margin-bottom: 4px; }
+    .upload-icon { font-size: 28px; margin-bottom: 8px; }
+    .upload-text strong { color: var(--blue); display: block; font-size: 13px; margin-bottom: 3px; }
+    .upload-text { font-size: 11px; color: #333; }
 
-    /* NOW PLAYING */
-    .now-playing { display: none; }
-    .now-playing.show { display: block; }
-    .np-cover { width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, var(--blue2), var(--blue)); display: flex; align-items: center; justify-content: center; font-size: 48px; margin-bottom: 16px; position: relative; overflow: hidden; }
-    .np-cover::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), transparent 60%); }
-    .np-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .np-sub { font-size: 11px; color: var(--muted); margin-bottom: 20px; }
+    /* PLAYER CARD */
+    .player-card { display: none; background: var(--surface); border: 1px solid var(--border); padding: 20px 16px; margin-top: 12px; position: relative; }
+    .player-card::before { content:''; position:absolute; top:0;left:0;right:0;height:2px; background:linear-gradient(90deg,var(--blue),transparent 60%); opacity:0.5; }
+    .player-card.show { display: block; animation: fadeUp 0.3s ease; }
+
+    .np-track { margin-bottom: 16px; }
+    .np-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .np-time { font-size: 11px; color: #444; }
 
     /* PROGRESS */
-    .progress-wrap { margin-bottom: 8px; position: relative; }
-    .progress-bar { width: 100%; height: 4px; background: var(--border); cursor: pointer; -webkit-appearance: none; appearance: none; outline: none; }
-    .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--blue); cursor: pointer; }
-    .progress-bar::-webkit-slider-runnable-track { background: linear-gradient(to right, var(--blue) var(--prog, 0%), var(--border) var(--prog, 0%)); height: 4px; }
-    .time-row { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 4px; }
+    .prog-outer { position: relative; height: 6px; background: var(--border); cursor: pointer; margin-bottom: 6px; border-radius: 3px; }
+    .prog-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--blue); border-radius: 3px; transition: width 0.1s linear; pointer-events: none; }
+    .prog-thumb { position: absolute; top: 50%; width: 14px; height: 14px; background: var(--blue); border-radius: 50%; transform: translate(-50%,-50%); box-shadow: 0 2px 6px rgba(26,111,255,0.4); cursor: pointer; }
+    .time-row { display: flex; justify-content: space-between; font-size: 10px; color: #444; margin-bottom: 18px; }
 
-    /* CONTROLS */
-    .controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 16px 0; }
-    .ctrl-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 20px; padding: 8px; -webkit-tap-highlight-color: transparent; transition: color 0.2s; }
-    .ctrl-btn:active { color: var(--blue); }
-    .ctrl-btn.active { color: var(--blue); }
-    .play-btn { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--blue2)); border: none; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(26,111,255,0.35); -webkit-tap-highlight-color: transparent; transition: transform 0.1s; }
-    .play-btn:active { transform: scale(0.92); }
+    /* MODERN CONTROLS */
+    .controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding: 0 4px; }
+    .ctrl-icon { background: none; border: none; cursor: pointer; padding: 10px; -webkit-tap-highlight-color: transparent; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
+    .ctrl-icon:active { opacity: 0.5; }
+    .ctrl-icon.active svg { stroke: var(--blue); fill: var(--bluesoft); }
+    .ctrl-icon svg { width: 22px; height: 22px; stroke: #222; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .play-icon { width: 52px; height: 52px; border-radius: 50%; background: var(--blue); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(26,111,255,0.35); -webkit-tap-highlight-color: transparent; transition: transform 0.1s; }
+    .play-icon:active { transform: scale(0.92); }
+    .play-icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    /* VOLUME */
-    .vol-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .vol-row span { font-size: 14px; }
+    /* VOL */
+    .vol-row { display: flex; align-items: center; gap: 10px; }
+    .vol-row svg { width: 16px; height: 16px; stroke: #333; fill: none; stroke-width: 1.8; flex-shrink: 0; }
     .vol-slider { flex: 1; height: 3px; background: var(--border); -webkit-appearance: none; appearance: none; outline: none; cursor: pointer; }
     .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--blue); }
 
     /* PLAYLIST */
-    .playlist { max-height: 240px; overflow-y: auto; }
-    .pl-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+    .playlist-card { display: none; background: var(--surface); border: 1px solid var(--border); margin-top: 10px; }
+    .playlist-card.show { display: block; }
+    .pl-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .pl-header span { font-size: 10px; letter-spacing: 0.15em; color: #222; font-weight: 600; }
+    .playlist { max-height: 220px; overflow-y: auto; }
+    .pl-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
     .pl-item:last-child { border-bottom: none; }
-    .pl-item:hover, .pl-item.active { background: var(--bluesoft); }
-    .pl-item.active .pl-name { color: var(--blue); font-weight: 500; }
-    .pl-num { font-size: 10px; color: var(--muted); width: 18px; text-align: center; flex-shrink: 0; }
-    .pl-name { flex: 1; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .pl-dur { font-size: 10px; color: var(--muted); flex-shrink: 0; }
-    .pl-del { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 0 4px; }
+    .pl-item:hover,.pl-item.playing { background: var(--bluesoft); }
+    .pl-item.playing .pl-name { color: var(--blue); font-weight: 600; }
+    .pl-num { font-size: 10px; color: #444; width: 18px; text-align: center; flex-shrink: 0; }
+    .pl-name { flex: 1; font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pl-dur { font-size: 10px; color: #555; flex-shrink: 0; }
+    .pl-del { background: none; border: none; color: #aaa; font-size: 14px; cursor: pointer; padding: 0 2px; }
     .pl-del:active { color: #cc2233; }
-    .pl-empty { padding: 24px; text-align: center; font-size: 12px; color: var(--muted); }
+    .pl-empty { padding: 24px; text-align: center; font-size: 12px; color: #555; }
 
-    /* ── EDITOR ── */
-    .editor-upload { border: 2px dashed var(--border); padding: 28px 20px; text-align: center; cursor: pointer; background: #fff; transition: border-color 0.2s; }
+    /* ══ EDITOR ══ */
+    .editor-upload { border: 2px dashed var(--border); padding: 24px 20px; text-align: center; cursor: pointer; background: #fff; transition: border-color 0.2s; }
     .editor-upload:hover { border-color: var(--blue); background: var(--bluesoft); }
     .editor-upload input { display: none; }
+    .editor-upload strong { color: var(--blue); display: block; font-size: 13px; margin-bottom: 3px; }
 
-    .waveform-wrap { position: relative; margin: 12px 0; background: #f0f4ff; border: 1px solid var(--border); height: 80px; overflow: hidden; cursor: crosshair; }
-    canvas#waveCanvas { width: 100%; height: 100%; display: block; }
+    /* WAVEFORM */
+    .wave-controls { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+    .wave-zoom-btn { background: #fff; border: 1.5px solid var(--border); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 5px 12px; cursor: pointer; transition: all 0.15s; }
+    .wave-zoom-btn:active { background: var(--bluesoft); border-color: var(--blue); }
+    .wave-zoom-label { font-size: 10px; color: #333; margin-left: auto; }
 
-    .trim-info { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 10px; }
-    .trim-info span { color: var(--blue); font-weight: 500; }
+    .waveform-outer { position: relative; background: #f0f4ff; border: 1px solid var(--border); height: 90px; overflow: hidden; cursor: crosshair; touch-action: none; user-select: none; }
+    canvas#waveCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    .wave-scrollbar { width: 100%; height: 6px; background: var(--border); margin-top: 4px; position: relative; cursor: pointer; }
+    .wave-scrollthumb { position: absolute; top: 0; height: 100%; background: var(--blue); border-radius: 3px; opacity: 0.6; }
+
+    .trim-info { display: flex; justify-content: space-between; font-size: 11px; color: #111; margin: 8px 0; font-weight: 500; }
+    .trim-info span { color: var(--blue); font-weight: 700; }
 
     .range-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-    .range-group label { font-size: 9px; letter-spacing: 0.15em; color: var(--muted); display: block; margin-bottom: 5px; }
+    .range-group label { font-size: 9px; letter-spacing: 0.15em; color: #222; display: block; margin-bottom: 5px; font-weight: 600; }
     .range-group input[type=number] { width: 100%; background: #fff; border: 1.5px solid var(--border); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 8px 10px; outline: none; }
     .range-group input[type=number]:focus { border-color: var(--blue); }
 
     .effect-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-    .effect-pill { font-size: 10px; padding: 5px 12px; border: 1.5px solid var(--border); color: var(--muted); cursor: pointer; background: #fff; transition: all 0.15s; user-select: none; }
+    .effect-pill { font-size: 10px; padding: 5px 12px; border: 1.5px solid var(--border); color: #333; cursor: pointer; background: #fff; transition: all 0.15s; user-select: none; }
     .effect-pill.on { border-color: var(--blue); color: var(--blue); background: var(--bluesoft); }
 
-    .editor-preview { width: 100%; background: #0d1530; border: none; color: #4dffb0; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 10px 12px; margin-bottom: 10px; display: none; }
+    .editor-preview { width: 100%; background: #0d1530; color: #4dffb0; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 10px 12px; margin-bottom: 10px; display: none; line-height: 1.7; white-space: pre-wrap; word-break: break-all; border: none; }
     .editor-preview.show { display: block; }
 
-    /* USAGE PAGE */
-    .usage-step { display: flex; gap: 14px; align-items: flex-start; padding: 18px 16px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 10px; position: relative; }
-    .usage-step::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--blue), transparent 60%); opacity: 0.4; }
-    .usage-num { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: var(--bluesoft); line-height: 1; flex-shrink: 0; width: 34px; text-align: center; -webkit-text-stroke: 1.5px var(--blue); }
-    .usage-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
-    .usage-desc { font-size: 11px; color: var(--muted); line-height: 1.7; }
-    .usage-desc strong { color: var(--blue); font-weight: 500; }
-    .usage-note { background: var(--bluesoft); border: 1px solid #c0d4ff; padding: 12px 14px; margin-top: 10px; font-size: 11px; color: var(--blue2); line-height: 1.7; }
-    .usage-note strong { font-weight: 700; display: block; margin-bottom: 4px; }
+    /* USAGE */
+    .usage-step { display: flex; gap: 14px; align-items: flex-start; padding: 16px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 10px; position: relative; }
+    .usage-step::before { content:''; position:absolute; top:0;left:0;right:0;height:2px; background:linear-gradient(90deg,var(--blue),transparent 60%); opacity:0.4; }
+    .usage-num { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: var(--bluesoft); line-height: 1; flex-shrink: 0; width: 32px; text-align: center; -webkit-text-stroke: 1.5px var(--blue); }
+    .usage-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+    .usage-desc { font-size: 11px; color: #222; line-height: 1.7; }
+    .usage-desc strong { color: var(--blue); font-weight: 600; }
+    .usage-note { background: var(--bluesoft); border: 1px solid #c0d4ff; padding: 12px 14px; margin-top: 10px; font-size: 11px; color: #0d2a70; line-height: 1.7; }
+    .usage-note strong { font-weight: 700; display: block; margin-bottom: 4px; color: var(--blue2); }
 
     /* COPYRIGHT */
-    .copyright-box { background: #fff8f0; border: 1px solid #f0d0a0; border-left: 3px solid #e07000; padding: 14px; margin-top: 14px; font-size: 11px; color: #7a5000; line-height: 1.8; }
-    .copyright-box strong { display: block; font-size: 12px; color: #5a3800; margin-bottom: 6px; }
+    .copyright-box { background: #fff8f0; border: 1px solid #f0d0a0; border-left: 3px solid #e07000; padding: 14px; margin-top: 12px; font-size: 11px; color: #5a3800; line-height: 1.8; }
+    .copyright-box strong { display: block; font-size: 12px; color: #3a2000; margin-bottom: 5px; }
 
     /* FOOTER */
-    .footer { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .footer-credit { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; }
-    .footer-credit span { color: var(--blue); font-weight: 500; }
-    .footer-ver { font-size: 10px; color: var(--border); }
+    .footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .footer-credit { font-size: 10px; color: #333; letter-spacing: 0.1em; }
+    .footer-credit span { color: var(--blue); font-weight: 600; }
+    .footer-ver { font-size: 10px; color: #aaa; }
 
     /* TOAST */
     .toast { position: fixed; bottom: calc(var(--safe-bot) + 20px); left: 50%; transform: translateX(-50%) translateY(16px); background: var(--blue2); color: #fff; font-size: 11px; padding: 10px 20px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 500; white-space: nowrap; box-shadow: 0 4px 20px rgba(13,71,204,0.3); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     @keyframes blink { 50% { opacity: 0; } }
-    .cursor { display: inline-block; width: 7px; height: 12px; background: var(--blue); vertical-align: middle; animation: blink 1s infinite; margin-left: 2px; }
-
-    /* scrollbar */
+    .cursor { display: inline-block; width: 7px; height: 12px; background: var(--blue); vertical-align: middle; animation: blink 1s infinite; }
     .playlist::-webkit-scrollbar { width: 4px; }
-    .playlist::-webkit-scrollbar-track { background: var(--bg2); }
     .playlist::-webkit-scrollbar-thumb { background: var(--border); }
   </style>
 </head>
 <body>
 
 <div id="installBanner">
-  <span>📱 Install as app</span>
+  <span>📱 Install as app on your home screen</span>
   <button class="banner-btn" id="installBtn">INSTALL</button>
   <button class="banner-dismiss" id="dismissBtn">✕</button>
 </div>
@@ -233,13 +238,12 @@
 
 <div class="scroll-body">
 
-  <!-- ══════════ EXTRACTOR ══════════ -->
+  <!-- ══ EXTRACTOR ══ -->
   <div class="page active" id="page-extractor">
     <div class="hero">
-      <h1>AUDIO<span class="accent">EXTRACTOR</span></h1>
+      <h1>AUDIO <span class="accent">EXTRACTOR</span></h1>
       <p class="hero-sub">Paste YouTube URL → Generate command → Run in terminal</p>
     </div>
-
     <div class="card">
       <div class="card-label">01 — Source URL</div>
       <div class="url-wrap">
@@ -247,7 +251,6 @@
         <button class="paste-btn" onclick="doPaste()">PASTE</button>
       </div>
     </div>
-
     <div class="card">
       <div class="card-label">02 — Output Settings</div>
       <div class="opts-row">
@@ -271,114 +274,131 @@
         <div class="pill" data-v="aac">AAC</div><div class="pill" data-v="opus">OPUS</div>
       </div>
     </div>
-
     <button class="gen-btn" onclick="generate()">▶ &nbsp;GENERATE COMMAND</button>
-
     <div id="output">
       <div class="card">
         <div class="card-label">03 — Command Output</div>
         <div class="terminal">
-          <div class="term-header">
-            <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
-            <span class="t-label">bash</span>
-          </div>
+          <div class="term-header"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="t-label">bash</span></div>
           <div id="termBody"></div>
         </div>
       </div>
       <div class="card">
         <div class="card-label">Setup Guide</div>
         <div class="isteps">
-          <div class="istep"><div class="istep-num">1</div><div class="istep-body"><div class="istep-title">Install yt-dlp</div><div class="snippet"><code>pip install yt-dlp</code><button class="copy-btn" onclick="cp('pip install yt-dlp',this)">COPY</button></div></div></div>
-          <div class="istep"><div class="istep-num">2</div><div class="istep-body"><div class="istep-title">Install ffmpeg</div>
+          <div class="istep"><div class="istep-num">1</div><div><div class="istep-title">Install yt-dlp</div><div class="snippet"><code>pip install yt-dlp</code><button class="copy-btn" onclick="cp('pip install yt-dlp',this)">COPY</button></div></div></div>
+          <div class="istep"><div class="istep-num">2</div><div><div class="istep-title">Install ffmpeg</div>
             <div class="snippet"><code>brew install ffmpeg</code><button class="copy-btn" onclick="cp('brew install ffmpeg',this)">macOS</button></div>
             <div class="snippet"><code>sudo apt install ffmpeg</code><button class="copy-btn" onclick="cp('sudo apt install ffmpeg',this)">Ubuntu</button></div>
             <div class="snippet"><code>winget install ffmpeg</code><button class="copy-btn" onclick="cp('winget install ffmpeg',this)">Windows</button></div>
           </div></div>
-          <div class="istep"><div class="istep-num">3</div><div class="istep-body"><div class="istep-title">Run the command</div>
-            <div class="snippet"><code id="finalCmd" style="color:var(--blue2)">Generate above ↑</code><button class="copy-btn" id="finalCopy" onclick="cpFinal(this)">COPY</button></div>
+          <div class="istep"><div class="istep-num">3</div><div><div class="istep-title">Run command</div>
+            <div class="snippet"><code id="finalCmd" style="color:var(--blue2)">Generate above ↑</code><button class="copy-btn" onclick="cpFinal(this)">COPY</button></div>
           </div></div>
         </div>
       </div>
     </div>
-
-    <div class="copyright-box"><strong>⚠ 저작권 안내 / Copyright Notice</strong>본 도구는 개인적, 비상업적 용도로만 사용하세요.<br/>저작권이 있는 콘텐츠의 무단 다운로드, 배포, 상업적 이용을 금지합니다.<br/>For personal, non-commercial use only.</div>
-    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v4.0 · PWA</div></div>
+    <div class="copyright-box"><strong>⚠ 저작권 안내 / Copyright Notice</strong>본 도구는 개인적, 비상업적 용도로만 사용하세요.<br/>저작권이 있는 콘텐츠의 무단 다운로드, 배포, 상업적 이용을 금지합니다.</div>
+    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v5.0 · PWA</div></div>
   </div>
 
-  <!-- ══════════ PLAYER ══════════ -->
+  <!-- ══ PLAYER ══ -->
   <div class="page" id="page-player">
     <div class="hero">
-      <h1>AUDIO<span class="accent">PLAYER</span></h1>
-      <p class="hero-sub">Upload audio files to play · Supports playlist</p>
+      <h1>AUDIO <span class="accent">PLAYER</span></h1>
+      <p class="hero-sub">Upload files · Playlist · Shuffle · Repeat</p>
     </div>
 
-    <!-- upload -->
     <label class="player-upload" id="playerUploadArea">
       <input type="file" id="playerFileInput" accept="audio/*" multiple/>
       <div class="upload-icon">🎵</div>
-      <div class="upload-text"><strong>Tap to add audio files</strong>MP3, WAV, FLAC, M4A, AAC supported</div>
+      <div class="upload-text"><strong>Tap to add audio files</strong>MP3 · WAV · FLAC · M4A · AAC</div>
     </label>
 
-    <!-- now playing -->
-    <div class="now-playing" id="nowPlaying">
-      <div class="card" style="margin-top:12px">
-        <div class="np-cover" id="npCover">🎵</div>
+    <div class="player-card" id="playerCard">
+      <div class="np-track">
         <div class="np-title" id="npTitle">—</div>
-        <div class="np-sub" id="npSub">0:00</div>
+        <div class="np-time" id="npTime">0:00 / 0:00</div>
+      </div>
 
-        <div class="progress-wrap">
-          <input type="range" class="progress-bar" id="progressBar" min="0" max="100" value="0" step="0.1"/>
-          <div class="time-row"><span id="timeCurrent">0:00</span><span id="timeDuration">0:00</span></div>
-        </div>
+      <div class="prog-outer" id="progOuter">
+        <div class="prog-fill" id="progFill" style="width:0%"></div>
+        <div class="prog-thumb" id="progThumb" style="left:0%"></div>
+      </div>
+      <div class="time-row"><span id="timeCurrent">0:00</span><span id="timeDuration">0:00</span></div>
 
-        <div class="controls">
-          <button class="ctrl-btn" id="btnShuffle" onclick="toggleShuffle()" title="Shuffle">🔀</button>
-          <button class="ctrl-btn" onclick="prevTrack()" title="Prev">⏮</button>
-          <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
-          <button class="ctrl-btn" onclick="nextTrack()" title="Next">⏭</button>
-          <button class="ctrl-btn" id="btnRepeat" onclick="toggleRepeat()" title="Repeat">🔁</button>
-        </div>
+      <div class="controls">
+        <!-- Shuffle -->
+        <button class="ctrl-icon" id="btnShuffle" onclick="toggleShuffle()" title="Shuffle">
+          <svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20l16-16M16 20h5v-5M4 4l16 16"/></svg>
+        </button>
+        <!-- Prev -->
+        <button class="ctrl-icon" onclick="prevTrack()" title="Previous">
+          <svg viewBox="0 0 24 24"><polygon points="19,20 9,12 19,4"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+        </button>
+        <!-- Play/Pause -->
+        <button class="play-icon" id="playBtn" onclick="togglePlay()">
+          <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="white" stroke="none"/></svg>
+        </button>
+        <!-- Next -->
+        <button class="ctrl-icon" onclick="nextTrack()" title="Next">
+          <svg viewBox="0 0 24 24"><polygon points="5,20 15,12 5,4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+        </button>
+        <!-- Repeat -->
+        <button class="ctrl-icon" id="btnRepeat" onclick="toggleRepeat()" title="Repeat">
+          <svg viewBox="0 0 24 24"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+        </button>
+      </div>
 
-        <div class="vol-row">
-          <span>🔈</span>
-          <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.01" value="1"/>
-          <span>🔊</span>
-        </div>
+      <div class="vol-row">
+        <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/></svg>
+        <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.01" value="1"/>
+        <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>
       </div>
     </div>
 
-    <!-- playlist -->
-    <div class="card" id="playlistCard" style="display:none">
-      <div class="card-label" style="display:flex;justify-content:space-between;align-items:center">
+    <div class="playlist-card" id="playlistCard">
+      <div class="pl-header">
         <span>PLAYLIST (<span id="plCount">0</span>)</span>
         <button class="btn danger" style="font-size:9px;padding:3px 8px" onclick="clearPlaylist()">CLEAR ALL</button>
       </div>
-      <div class="playlist" id="playlist"></div>
+      <div class="playlist" id="playlist"><div class="pl-empty">No files added</div></div>
     </div>
 
     <div class="copyright-box" style="margin-top:12px"><strong>⚠ 저작권 안내</strong>개인 소장 파일만 재생하세요. 무단 배포 금지.</div>
-    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v4.0 · PWA</div></div>
+    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v5.0 · PWA</div></div>
   </div>
 
-  <!-- ══════════ EDITOR ══════════ -->
+  <!-- ══ EDITOR ══ -->
   <div class="page" id="page-editor">
     <div class="hero">
-      <h1>AUDIO<span class="accent">EDITOR</span></h1>
-      <p class="hero-sub">Trim · Fade out · Preview · Export command</p>
+      <h1>AUDIO <span class="accent">EDITOR</span></h1>
+      <p class="hero-sub">Drag waveform to select · Zoom · Fade · Export</p>
     </div>
 
     <label class="editor-upload" id="editorUploadArea">
       <input type="file" id="editorFileInput" accept="audio/*"/>
       <div class="upload-icon">✂️</div>
-      <div class="upload-text"><strong>Tap to load audio file</strong>Load a file to edit</div>
+      <div class="upload-text"><strong id="editorFileName">Tap to load audio file</strong>Drag to select trim range on waveform</div>
     </label>
 
     <div id="editorPanel" style="display:none">
       <div class="card" style="margin-top:12px">
-        <div class="card-label">WAVEFORM</div>
-        <div class="waveform-wrap" id="waveformWrap">
+        <div class="card-label">WAVEFORM — drag to select range</div>
+
+        <div class="wave-controls">
+          <button class="wave-zoom-btn" onclick="zoomWave(-1)">− Zoom Out</button>
+          <button class="wave-zoom-btn" onclick="zoomWave(1)">+ Zoom In</button>
+          <span class="wave-zoom-label" id="zoomLabel">1×</span>
+        </div>
+
+        <div class="waveform-outer" id="waveformOuter">
           <canvas id="waveCanvas"></canvas>
         </div>
+        <div class="wave-scrollbar" id="waveScrollbar">
+          <div class="wave-scrollthumb" id="waveScrollThumb"></div>
+        </div>
+
         <div class="trim-info">
           <div>Start: <span id="trimStartLabel">0.0s</span></div>
           <div>End: <span id="trimEndLabel">0.0s</span></div>
@@ -387,20 +407,20 @@
       </div>
 
       <div class="card">
-        <div class="card-label">TRIM RANGE</div>
+        <div class="card-label">TRIM RANGE (manual input)</div>
         <div class="range-row">
-          <div class="range-group"><label>Start (sec)</label><input type="number" id="trimStart" min="0" step="0.1" value="0" oninput="updateTrimInfo()"/></div>
-          <div class="range-group"><label>End (sec)</label><input type="number" id="trimEnd" min="0" step="0.1" value="0" oninput="updateTrimInfo()"/></div>
+          <div class="range-group"><label>Start (sec)</label><input type="number" id="trimStart" min="0" step="0.1" value="0" oninput="onManualInput()"/></div>
+          <div class="range-group"><label>End (sec)</label><input type="number" id="trimEnd" min="0" step="0.1" value="0" oninput="onManualInput()"/></div>
         </div>
 
-        <div class="card-label" style="margin-top:8px">EFFECTS</div>
+        <div class="card-label" style="margin-top:4px">EFFECTS</div>
         <div class="effect-row">
           <div class="effect-pill" data-e="fadein" onclick="toggleEffect(this)">Fade In</div>
           <div class="effect-pill" data-e="fadeout" onclick="toggleEffect(this)">Fade Out</div>
           <div class="effect-pill" data-e="normalize" onclick="toggleEffect(this)">Normalize</div>
         </div>
 
-        <div class="card-label" style="margin-top:8px">PREVIEW COMMAND</div>
+        <div class="card-label" style="margin-top:4px">GENERATED COMMAND</div>
         <pre class="editor-preview" id="editorPreview"></pre>
 
         <div class="btn-row">
@@ -411,60 +431,49 @@
 
       <div class="card">
         <div class="card-label">PLAYBACK</div>
-        <audio id="editorAudio" controls style="width:100%;margin-top:4px"></audio>
+        <audio id="editorAudio" controls style="width:100%"></audio>
       </div>
     </div>
 
     <div class="copyright-box" style="margin-top:12px"><strong>⚠ 저작권 안내</strong>개인 소장 파일만 편집하세요. 무단 배포 금지.</div>
-    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v4.0 · PWA</div></div>
+    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v5.0 · PWA</div></div>
   </div>
 
-  <!-- ══════════ GUIDE ══════════ -->
+  <!-- ══ GUIDE ══ -->
   <div class="page" id="page-howto">
     <div class="hero">
-      <h1>HOW TO<span class="accent">USE</span></h1>
+      <h1>HOW TO <span class="accent">USE</span></h1>
       <p class="hero-sub">Step-by-step guide</p>
     </div>
-
     <div class="usage-step"><div class="usage-num">1</div><div><div class="usage-title">Copy YouTube URL</div><div class="usage-desc">유튜브 영상 주소를 복사하세요.<br/><strong>예: https://youtu.be/XXXXXXX</strong></div></div></div>
-    <div class="usage-step"><div class="usage-num">2</div><div><div class="usage-title">EXTRACT 탭 → Paste & Generate</div><div class="usage-desc">PASTE 버튼으로 URL 붙여넣기 후<br/><strong>GENERATE COMMAND</strong> 클릭</div></div></div>
-    <div class="usage-step"><div class="usage-num">3</div><div><div class="usage-title">Terminal에서 실행</div><div class="usage-desc">생성된 커맨드를 복사해<br/>PC 터미널에서 실행하면 음원 파일이 저장됩니다.<br/><strong>yt-dlp와 ffmpeg 설치 필요</strong></div></div></div>
-    <div class="usage-step"><div class="usage-num">4</div><div><div class="usage-title">PLAYER 탭 → 재생</div><div class="usage-desc">저장된 음원 파일을 불러와<br/><strong>반복·셔플·재생목록</strong> 기능으로 감상</div></div></div>
-    <div class="usage-step"><div class="usage-num">5</div><div><div class="usage-title">EDITOR 탭 → 편집</div><div class="usage-desc">파일을 불러와 <strong>구간 자르기</strong>, <strong>페이드인/아웃</strong> 효과 설정 후<br/>ffmpeg 커맨드를 생성해 PC에서 실행</div></div></div>
-
-    <div class="usage-note"><strong>💡 지원 형식</strong>MP3 · WAV · FLAC · M4A · AAC · OPUS<br/><br/><strong>⚠ 백그라운드 재생</strong>PLAYER 탭에서 파일 재생 중 화면을 끄면<br/>브라우저 설정에 따라 재생이 유지될 수 있습니다.<br/>완전한 백그라운드 재생은 네이티브 앱에서만 보장됩니다.</div>
-
+    <div class="usage-step"><div class="usage-num">2</div><div><div class="usage-title">EXTRACT → Paste & Generate</div><div class="usage-desc">PASTE 버튼으로 URL 붙여넣기 후<br/><strong>GENERATE COMMAND</strong> 클릭</div></div></div>
+    <div class="usage-step"><div class="usage-num">3</div><div><div class="usage-title">Terminal에서 실행</div><div class="usage-desc">생성된 커맨드를 PC 터미널에서 실행<br/><strong>yt-dlp와 ffmpeg 설치 필요</strong></div></div></div>
+    <div class="usage-step"><div class="usage-num">4</div><div><div class="usage-title">PLAYER → 재생</div><div class="usage-desc">음원 파일을 불러와 <strong>반복·셔플·재생목록</strong>으로 감상</div></div></div>
+    <div class="usage-step"><div class="usage-num">5</div><div><div class="usage-title">EDITOR → 편집</div><div class="usage-desc"><strong>파형 드래그</strong>로 구간 선택, <strong>줌인/아웃</strong>으로 정밀 편집<br/>페이드인/아웃 효과 적용 후 ffmpeg 커맨드 생성</div></div></div>
+    <div class="usage-note"><strong>💡 지원 형식</strong>MP3 · WAV · FLAC · M4A · AAC · OPUS<br/><br/><strong>⚠ 백그라운드 재생</strong>브라우저 설정에 따라 화면 꺼도 재생 유지 가능.<br/>완전한 백그라운드 재생은 네이티브 앱에서만 보장됩니다.</div>
     <div class="copyright-box"><strong>⚠ 저작권 안내 / Copyright Notice</strong>본 도구는 개인적, 비상업적 용도로만 사용하세요.<br/>저작권이 있는 콘텐츠의 무단 다운로드 및 배포는 저작권법에 위반됩니다.<br/>상업적 이용 및 무단 재배포를 금지합니다.</div>
-    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v4.0 · PWA</div></div>
+    <div class="footer"><div class="footer-credit">MADE BY <span>추인엽</span></div><div class="footer-ver">v5.0 · PWA</div></div>
   </div>
 
-</div><!-- /scroll-body -->
+</div>
 <div class="toast" id="toast"></div>
-
-<!-- HIDDEN AUDIO -->
 <audio id="mainAudio"></audio>
 
 <script>
 // ── PWA ──
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt=e; document.getElementById('installBanner').classList.add('show'); });
-document.getElementById('installBtn').addEventListener('click', async () => { if(!deferredPrompt)return; deferredPrompt.prompt(); const {outcome}=await deferredPrompt.userChoice; if(outcome==='accepted')toast('App installed ✓'); deferredPrompt=null; document.getElementById('installBanner').classList.remove('show'); });
-document.getElementById('dismissBtn').addEventListener('click', ()=>document.getElementById('installBanner').classList.remove('show'));
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBanner').classList.add('show');});
+document.getElementById('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;if(outcome==='accepted')toast('App installed ✓');deferredPrompt=null;document.getElementById('installBanner').classList.remove('show');});
+document.getElementById('dismissBtn').addEventListener('click',()=>document.getElementById('installBanner').classList.remove('show'));
 
 // ── TABS ──
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('page-'+name).classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+function switchTab(name,btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('page-'+name).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 
 // ── EXTRACTOR ──
-document.querySelectorAll('.pill').forEach(p=>p.addEventListener('click',()=>{ document.getElementById('fmtSel').value=p.dataset.v; syncPills(); }));
-function syncPills(){ const v=document.getElementById('fmtSel').value; document.querySelectorAll('#page-extractor .pill').forEach(p=>p.classList.toggle('on',p.dataset.v===v)); }
-async function doPaste(){ try{ const t=await navigator.clipboard.readText(); document.getElementById('urlInput').value=t; toast('Pasted ✓'); }catch{ toast('Clipboard permission required'); } }
+document.querySelectorAll('#page-extractor .pill').forEach(p=>p.addEventListener('click',()=>{document.getElementById('fmtSel').value=p.dataset.v;syncPills();}));
+function syncPills(){const v=document.getElementById('fmtSel').value;document.querySelectorAll('#page-extractor .pill').forEach(p=>p.classList.toggle('on',p.dataset.v===v));}
+async function doPaste(){try{const t=await navigator.clipboard.readText();document.getElementById('urlInput').value=t;toast('Pasted ✓');}catch{toast('Clipboard permission required');}}
 function generate(){
   const url=document.getElementById('urlInput').value.trim();
   const fmt=document.getElementById('fmtSel').value;
@@ -474,196 +483,318 @@ function generate(){
   const cmd=`yt-dlp -x --audio-format ${fmt} --audio-quality ${qual}k "${url}"`;
   document.getElementById('termBody').innerHTML=`<div><span class="t-prompt">❯</span> <span class="t-cmd">${esc(cmd)}</span></div><div class="t-dim">[yt-dlp] Fetching metadata...</div><div class="t-dim">[download] 100% of ~4.20MiB</div><div class="t-dim">[ffmpeg] Extracting audio → .${fmt}</div><div class="t-ok" style="margin-top:4px">✔ Done → output.${fmt}</div><span class="cursor"></span>`;
   document.getElementById('finalCmd').textContent=cmd;
-  const out=document.getElementById('output'); out.classList.add('show');
+  const out=document.getElementById('output');out.classList.add('show');
   setTimeout(()=>out.scrollIntoView({behavior:'smooth',block:'start'}),80);
   toast('Command generated ✓');
 }
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function cp(text,btn){navigator.clipboard.writeText(text).then(()=>{const o=btn.textContent;btn.textContent='✓';btn.classList.add('ok');setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok');},1500)});}
+function cp(text,btn){navigator.clipboard.writeText(text).then(()=>{const o=btn.textContent;btn.textContent='✓';btn.classList.add('ok');setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok');},1500);});}
 function cpFinal(btn){cp(document.getElementById('finalCmd').textContent,btn);}
 
 // ── PLAYER ──
-const audio = document.getElementById('mainAudio');
-let playlist = [], currentIndex = 0, isShuffled = false, repeatMode = 0; // 0=none,1=one,2=all
-let shuffleOrder = [];
+const audio=document.getElementById('mainAudio');
+let playlist=[],currentIndex=0,isShuffled=false,repeatMode=0,shuffleOrder=[];
 
-const playerFileInput = document.getElementById('playerFileInput');
-const playerUploadArea = document.getElementById('playerUploadArea');
-
-playerUploadArea.addEventListener('dragover', e=>{ e.preventDefault(); playerUploadArea.classList.add('drag'); });
-playerUploadArea.addEventListener('dragleave', ()=>playerUploadArea.classList.remove('drag'));
-playerUploadArea.addEventListener('drop', e=>{ e.preventDefault(); playerUploadArea.classList.remove('drag'); addFiles(Array.from(e.dataTransfer.files)); });
-playerFileInput.addEventListener('change', e=>addFiles(Array.from(e.target.files)));
+document.getElementById('playerFileInput').addEventListener('change',e=>addFiles(Array.from(e.target.files)));
+const pua=document.getElementById('playerUploadArea');
+pua.addEventListener('dragover',e=>{e.preventDefault();pua.classList.add('drag');});
+pua.addEventListener('dragleave',()=>pua.classList.remove('drag'));
+pua.addEventListener('drop',e=>{e.preventDefault();pua.classList.remove('drag');addFiles(Array.from(e.dataTransfer.files));});
 
 function addFiles(files){
-  files.filter(f=>f.type.startsWith('audio/')).forEach(f=>{
-    playlist.push({name:f.name.replace(/\.[^.]+$/,''), file:f, url:URL.createObjectURL(f)});
-  });
+  const audio_files=files.filter(f=>f.type.startsWith('audio/'));
+  audio_files.forEach(f=>playlist.push({name:f.name.replace(/\.[^.]+$/,''),file:f,url:URL.createObjectURL(f),dur:'—'}));
   renderPlaylist();
-  if(playlist.length===files.length) loadTrack(0);
-  document.getElementById('playlistCard').style.display='block';
-  document.getElementById('nowPlaying').classList.add('show');
-  toast(`${files.length} file(s) added`);
+  if(playlist.length>0&&playlist.length===audio_files.length) loadTrack(0);
+  document.getElementById('playerCard').classList.add('show');
+  document.getElementById('playlistCard').classList.add('show');
+  toast(`${audio_files.length} file(s) added`);
 }
 
 function renderPlaylist(){
-  const pl=document.getElementById('playlist');
   document.getElementById('plCount').textContent=playlist.length;
+  const pl=document.getElementById('playlist');
   if(!playlist.length){pl.innerHTML='<div class="pl-empty">No files added</div>';return;}
-  pl.innerHTML=playlist.map((t,i)=>`
-    <div class="pl-item ${i===currentIndex?'active':''}" onclick="loadTrack(${i});togglePlay(true)">
-      <span class="pl-num">${i+1}</span>
-      <span class="pl-name">${t.name}</span>
-      <button class="pl-del" onclick="removeTrack(event,${i})">✕</button>
-    </div>`).join('');
+  pl.innerHTML=playlist.map((t,i)=>`<div class="pl-item ${i===currentIndex?'playing':''}" onclick="loadTrack(${i});audio.play();updatePlayIcon()"><span class="pl-num">${i===currentIndex?'▶':i+1}</span><span class="pl-name">${t.name}</span><span class="pl-dur">${t.dur}</span><button class="pl-del" onclick="removeTrack(event,${i})">✕</button></div>`).join('');
 }
 
 function loadTrack(idx){
   if(idx<0||idx>=playlist.length)return;
   currentIndex=idx;
-  const t=playlist[idx];
-  audio.src=t.url;
-  document.getElementById('npTitle').textContent=t.name;
+  audio.src=playlist[idx].url;
+  document.getElementById('npTitle').textContent=playlist[idx].name;
   renderPlaylist();
 }
 
-function togglePlay(forcePlay){
+function togglePlay(force){
   if(!playlist.length)return;
-  if(forcePlay||audio.paused){ audio.play(); document.getElementById('playBtn').textContent='⏸'; }
-  else { audio.pause(); document.getElementById('playBtn').textContent='▶'; }
+  if(force||audio.paused){audio.play();}else{audio.pause();}
+  updatePlayIcon();
+}
+function updatePlayIcon(){
+  const svg=document.getElementById('playIcon');
+  if(audio.paused){svg.innerHTML='<polygon points="5,3 19,12 5,21" fill="white" stroke="none"/>';}
+  else{svg.innerHTML='<line x1="6" y1="4" x2="6" y2="20" stroke="white" stroke-width="3"/><line x1="18" y1="4" x2="18" y2="20" stroke="white" stroke-width="3"/>';}
 }
 
-function prevTrack(){ loadTrack(currentIndex>0?currentIndex-1:playlist.length-1); if(!audio.paused)audio.play(); }
+function prevTrack(){loadTrack(currentIndex>0?currentIndex-1:playlist.length-1);if(!audio.paused)audio.play();}
+function nextTrack(){loadTrack((currentIndex+1)%playlist.length);if(!audio.paused)audio.play();}
 function nextTrackAuto(){
-  if(repeatMode===1){ audio.currentTime=0; audio.play(); return; }
-  let next;
-  if(isShuffled){ const i=shuffleOrder.indexOf(currentIndex); next=shuffleOrder[(i+1)%shuffleOrder.length]; }
-  else { next=(currentIndex+1)%playlist.length; }
-  if(next===0&&repeatMode===0){ audio.pause(); document.getElementById('playBtn').textContent='▶'; return; }
-  loadTrack(next); audio.play();
+  if(repeatMode===1){audio.currentTime=0;audio.play();return;}
+  const next=isShuffled?shuffleOrder[(shuffleOrder.indexOf(currentIndex)+1)%shuffleOrder.length]:(currentIndex+1)%playlist.length;
+  if(next===0&&repeatMode===0){audio.pause();updatePlayIcon();return;}
+  loadTrack(next);audio.play();
 }
-function nextTrack(){ loadTrack(isShuffled?shuffleOrder[(shuffleOrder.indexOf(currentIndex)+1)%shuffleOrder.length]:(currentIndex+1)%playlist.length); if(!audio.paused)audio.play(); }
-
-function toggleShuffle(){
-  isShuffled=!isShuffled;
-  document.getElementById('btnShuffle').classList.toggle('active',isShuffled);
-  if(isShuffled){ shuffleOrder=[...Array(playlist.length).keys()].sort(()=>Math.random()-0.5); toast('Shuffle ON'); }
-  else toast('Shuffle OFF');
-}
-
+function toggleShuffle(){isShuffled=!isShuffled;document.getElementById('btnShuffle').classList.toggle('active',isShuffled);if(isShuffled)shuffleOrder=[...Array(playlist.length).keys()].sort(()=>Math.random()-0.5);toast(isShuffled?'Shuffle ON':'Shuffle OFF');}
 function toggleRepeat(){
   repeatMode=(repeatMode+1)%3;
   const btn=document.getElementById('btnRepeat');
-  const icons=['🔁','🔂','🔁'];
-  btn.textContent=icons[repeatMode];
   btn.classList.toggle('active',repeatMode>0);
+  // change icon for repeat-one
+  if(repeatMode===1){btn.querySelector('svg').innerHTML='<polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 01-4 4H3"/><text x="11" y="14" font-size="7" fill="var(--blue)" font-family="monospace">1</text>';}
+  else{btn.querySelector('svg').innerHTML='<polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 01-4 4H3"/>';}
   toast(['Repeat OFF','Repeat ONE','Repeat ALL'][repeatMode]);
 }
+function removeTrack(e,i){e.stopPropagation();URL.revokeObjectURL(playlist[i].url);playlist.splice(i,1);if(currentIndex>=playlist.length)currentIndex=Math.max(0,playlist.length-1);renderPlaylist();}
+function clearPlaylist(){playlist.forEach(t=>URL.revokeObjectURL(t.url));playlist=[];audio.pause();audio.src='';updatePlayIcon();document.getElementById('npTitle').textContent='—';document.getElementById('playerCard').classList.remove('show');document.getElementById('playlistCard').classList.remove('show');renderPlaylist();}
 
-function removeTrack(e,i){ e.stopPropagation(); URL.revokeObjectURL(playlist[i].url); playlist.splice(i,1); if(currentIndex>=playlist.length)currentIndex=Math.max(0,playlist.length-1); renderPlaylist(); toast('Removed'); }
-function clearPlaylist(){ playlist.forEach(t=>URL.revokeObjectURL(t.url)); playlist=[]; audio.pause(); audio.src=''; document.getElementById('playBtn').textContent='▶'; document.getElementById('npTitle').textContent='—'; document.getElementById('playlistCard').style.display='none'; document.getElementById('nowPlaying').classList.remove('show'); renderPlaylist(); }
-
-audio.addEventListener('ended', nextTrackAuto);
-audio.addEventListener('timeupdate', ()=>{
+// Progress
+const progOuter=document.getElementById('progOuter');
+audio.addEventListener('ended',nextTrackAuto);
+audio.addEventListener('timeupdate',()=>{
   if(!audio.duration)return;
   const pct=(audio.currentTime/audio.duration)*100;
-  const bar=document.getElementById('progressBar');
-  bar.value=pct; bar.style.setProperty('--prog',pct+'%');
-  document.getElementById('timeCurrent').textContent=fmt(audio.currentTime);
-  document.getElementById('npSub').textContent=fmt(audio.currentTime)+' / '+fmt(audio.duration);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progThumb').style.left=pct+'%';
+  document.getElementById('timeCurrent').textContent=fmtT(audio.currentTime);
+  document.getElementById('timeDuration').textContent=fmtT(audio.duration);
+  document.getElementById('npTime').textContent=fmtT(audio.currentTime)+' / '+fmtT(audio.duration);
 });
-audio.addEventListener('loadedmetadata', ()=>{ document.getElementById('timeDuration').textContent=fmt(audio.duration); document.getElementById('trimEnd').value=audio.duration.toFixed(1); updateTrimInfo(); });
-document.getElementById('progressBar').addEventListener('input', e=>{ if(audio.duration) audio.currentTime=(e.target.value/100)*audio.duration; });
-document.getElementById('volSlider').addEventListener('input', e=>audio.volume=e.target.value);
-function fmt(s){ const m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
+audio.addEventListener('loadedmetadata',()=>{
+  const dur=fmtT(audio.duration);
+  if(playlist[currentIndex])playlist[currentIndex].dur=dur;
+  renderPlaylist();
+});
+progOuter.addEventListener('click',e=>{
+  const r=progOuter.getBoundingClientRect();
+  const pct=(e.clientX-r.left)/r.width;
+  if(audio.duration)audio.currentTime=pct*audio.duration;
+});
+document.getElementById('volSlider').addEventListener('input',e=>audio.volume=e.target.value);
+function fmtT(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
 
 // ── EDITOR ──
-let editorFile=null, editorDuration=0, activeEffects=new Set();
-const editorFileInput=document.getElementById('editorFileInput');
-const editorUploadArea=document.getElementById('editorUploadArea');
+let editorFile=null,editorDuration=0,activeEffects=new Set();
+let waveData=null,zoomLevel=1,scrollOffset=0;
+let selStart=null,selEnd=null,isDragging=false,dragStartX=0;
+const MAX_ZOOM=32;
 
-editorUploadArea.addEventListener('dragover',e=>{e.preventDefault();editorUploadArea.style.borderColor='var(--blue)';});
-editorUploadArea.addEventListener('dragleave',()=>editorUploadArea.style.borderColor='');
-editorUploadArea.addEventListener('drop',e=>{e.preventDefault();editorUploadArea.style.borderColor='';loadEditorFile(e.dataTransfer.files[0]);});
-editorFileInput.addEventListener('change',e=>loadEditorFile(e.target.files[0]));
+document.getElementById('editorFileInput').addEventListener('change',e=>loadEditorFile(e.target.files[0]));
+const eua=document.getElementById('editorUploadArea');
+eua.addEventListener('dragover',e=>{e.preventDefault();eua.style.borderColor='var(--blue)';});
+eua.addEventListener('dragleave',()=>eua.style.borderColor='');
+eua.addEventListener('drop',e=>{e.preventDefault();eua.style.borderColor='';loadEditorFile(e.dataTransfer.files[0]);});
 
 async function loadEditorFile(file){
   if(!file||!file.type.startsWith('audio/'))return;
   editorFile=file;
+  document.getElementById('editorFileName').textContent=file.name;
   const url=URL.createObjectURL(file);
-  const edAudio=document.getElementById('editorAudio');
-  edAudio.src=url;
+  document.getElementById('editorAudio').src=url;
   document.getElementById('editorPanel').style.display='block';
-  document.querySelector('.editor-upload strong').textContent=file.name;
-  toast('File loaded ✓');
-  // draw waveform
+  toast('Loading waveform...');
   try{
     const ctx=new AudioContext();
     const buf=await file.arrayBuffer();
     const decoded=await ctx.decodeAudioData(buf);
     editorDuration=decoded.duration;
-    document.getElementById('trimEnd').value=editorDuration.toFixed(1);
+    waveData=decoded.getChannelData(0);
+    zoomLevel=1; scrollOffset=0;
+    selStart=0; selEnd=editorDuration;
+    document.getElementById('trimStart').value=selStart.toFixed(2);
+    document.getElementById('trimEnd').value=selEnd.toFixed(2);
     updateTrimInfo();
-    drawWaveform(decoded);
+    drawWaveform();
     ctx.close();
-  }catch(e){ console.warn('Waveform error',e); }
+    toast('File loaded ✓');
+  }catch(err){console.warn(err);toast('Waveform error');}
 }
 
-function drawWaveform(decoded){
+function zoomWave(dir){
+  if(dir>0&&zoomLevel<MAX_ZOOM) zoomLevel*=2;
+  else if(dir<0&&zoomLevel>1) zoomLevel/=2;
+  // keep scroll in bounds
+  const visible=editorDuration/zoomLevel;
+  const maxOffset=editorDuration-visible;
+  scrollOffset=Math.max(0,Math.min(scrollOffset,maxOffset));
+  document.getElementById('zoomLabel').textContent=zoomLevel+'×';
+  drawWaveform();
+  updateScrollThumb();
+}
+
+function drawWaveform(){
+  if(!waveData)return;
+  const outer=document.getElementById('waveformOuter');
   const canvas=document.getElementById('waveCanvas');
-  const wrap=document.getElementById('waveformWrap');
-  canvas.width=wrap.offsetWidth; canvas.height=80;
+  const W=outer.offsetWidth||300, H=90;
+  canvas.width=W; canvas.height=H;
   const ctx=canvas.getContext('2d');
-  const data=decoded.getChannelData(0);
-  const step=Math.ceil(data.length/canvas.width);
-  const h=canvas.height;
-  ctx.fillStyle='#f0f4ff'; ctx.fillRect(0,0,canvas.width,h);
-  ctx.strokeStyle='var(--blue)'; ctx.lineWidth=1;
-  for(let i=0;i<canvas.width;i++){
+
+  const visibleDuration=editorDuration/zoomLevel;
+  const startSample=Math.floor((scrollOffset/editorDuration)*waveData.length);
+  const endSample=Math.floor(((scrollOffset+visibleDuration)/editorDuration)*waveData.length);
+  const sampleCount=endSample-startSample;
+  const step=Math.max(1,Math.floor(sampleCount/W));
+
+  // bg
+  ctx.fillStyle='#f0f4ff'; ctx.fillRect(0,0,W,H);
+
+  // selection highlight
+  if(selStart!==null&&selEnd!==null){
+    const sx=timeToPx(selStart,W,visibleDuration);
+    const ex=timeToPx(selEnd,W,visibleDuration);
+    ctx.fillStyle='rgba(26,111,255,0.12)';
+    ctx.fillRect(sx,0,ex-sx,H);
+  }
+
+  // waveform
+  ctx.strokeStyle='#1a6fff';ctx.lineWidth=1;
+  for(let i=0;i<W;i++){
     let max=0;
-    for(let j=0;j<step;j++){const v=Math.abs(data[i*step+j]||0);if(v>max)max=v;}
-    const y=(1-max)*h/2;
-    ctx.beginPath(); ctx.moveTo(i,y); ctx.lineTo(i,h-y); ctx.stroke();
+    for(let j=0;j<step;j++){const v=Math.abs(waveData[startSample+i*step+j]||0);if(v>max)max=v;}
+    const y=(1-max)*H/2;
+    ctx.beginPath();ctx.moveTo(i,y);ctx.lineTo(i,H-y);ctx.stroke();
+  }
+
+  // selection handles
+  if(selStart!==null){
+    const sx=timeToPx(selStart,W,visibleDuration);
+    ctx.strokeStyle='#0d47cc';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(sx,0);ctx.lineTo(sx,H);ctx.stroke();
+    ctx.fillStyle='#0d47cc';ctx.fillRect(sx-4,0,8,12);
+  }
+  if(selEnd!==null){
+    const ex=timeToPx(selEnd,W,visibleDuration);
+    ctx.strokeStyle='#0d47cc';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(ex,0);ctx.lineTo(ex,H);ctx.stroke();
+    ctx.fillStyle='#0d47cc';ctx.fillRect(ex-4,H-12,8,12);
   }
 }
 
-function toggleEffect(el){ el.classList.toggle('on'); if(el.classList.contains('on'))activeEffects.add(el.dataset.e); else activeEffects.delete(el.dataset.e); }
+function timeToPx(t,W,visibleDuration){return((t-scrollOffset)/visibleDuration)*W;}
+function pxToTime(px,W,visibleDuration){return scrollOffset+(px/W)*visibleDuration;}
 
+function updateScrollThumb(){
+  const thumb=document.getElementById('waveScrollThumb');
+  const bar=document.getElementById('waveScrollbar');
+  const visibleDuration=editorDuration/zoomLevel;
+  const ratio=visibleDuration/editorDuration;
+  const offsetRatio=scrollOffset/editorDuration;
+  thumb.style.width=(ratio*100)+'%';
+  thumb.style.left=(offsetRatio*100)+'%';
+}
+
+// drag on waveform
+const waveOuter=document.getElementById('waveformOuter');
+waveOuter.addEventListener('mousedown',waveStart);
+waveOuter.addEventListener('touchstart',e=>waveStart(e.touches[0]),{passive:true});
+waveOuter.addEventListener('mousemove',waveMove);
+waveOuter.addEventListener('touchmove',e=>{e.preventDefault();waveMove(e.touches[0]);},{passive:false});
+waveOuter.addEventListener('mouseup',waveEnd);
+waveOuter.addEventListener('touchend',waveEnd);
+document.addEventListener('mouseup',waveEnd);
+
+function waveStart(e){
+  if(!waveData)return;
+  isDragging=true;
+  const r=waveOuter.getBoundingClientRect();
+  const px=e.clientX-r.left;
+  const W=r.width;
+  const visibleDuration=editorDuration/zoomLevel;
+  dragStartX=px;
+  selStart=Math.max(0,Math.min(pxToTime(px,W,visibleDuration),editorDuration));
+  selEnd=selStart;
+  syncInputsFromSel();
+  drawWaveform();
+}
+function waveMove(e){
+  if(!isDragging||!waveData)return;
+  const r=waveOuter.getBoundingClientRect();
+  const px=e.clientX-r.left;
+  const W=r.width;
+  const visibleDuration=editorDuration/zoomLevel;
+  const t=Math.max(0,Math.min(pxToTime(px,W,visibleDuration),editorDuration));
+  if(px>=dragStartX){selEnd=t;}else{selStart=t;}
+  syncInputsFromSel();
+  drawWaveform();
+}
+function waveEnd(){
+  if(!isDragging)return;
+  isDragging=false;
+  if(selStart>selEnd)[selStart,selEnd]=[selEnd,selStart];
+  syncInputsFromSel();
+  updateTrimInfo();
+  drawWaveform();
+}
+
+// scrollbar drag
+const scrollbar=document.getElementById('waveScrollbar');
+scrollbar.addEventListener('click',e=>{
+  if(!editorDuration)return;
+  const r=scrollbar.getBoundingClientRect();
+  const pct=(e.clientX-r.left)/r.width;
+  const visibleDuration=editorDuration/zoomLevel;
+  scrollOffset=Math.max(0,Math.min(pct*editorDuration,editorDuration-visibleDuration));
+  drawWaveform();updateScrollThumb();
+});
+
+function syncInputsFromSel(){
+  document.getElementById('trimStart').value=(selStart||0).toFixed(2);
+  document.getElementById('trimEnd').value=(selEnd||0).toFixed(2);
+  updateTrimInfo();
+}
+function onManualInput(){
+  selStart=parseFloat(document.getElementById('trimStart').value)||0;
+  selEnd=parseFloat(document.getElementById('trimEnd').value)||0;
+  updateTrimInfo();
+  drawWaveform();
+}
 function updateTrimInfo(){
   const s=parseFloat(document.getElementById('trimStart').value)||0;
   const e=parseFloat(document.getElementById('trimEnd').value)||0;
-  document.getElementById('trimStartLabel').textContent=s.toFixed(1)+'s';
-  document.getElementById('trimEndLabel').textContent=e.toFixed(1)+'s';
-  document.getElementById('trimDurLabel').textContent=Math.max(0,e-s).toFixed(1)+'s';
+  document.getElementById('trimStartLabel').textContent=s.toFixed(2)+'s';
+  document.getElementById('trimEndLabel').textContent=e.toFixed(2)+'s';
+  document.getElementById('trimDurLabel').textContent=Math.max(0,e-s).toFixed(2)+'s';
 }
-
+function toggleEffect(el){el.classList.toggle('on');if(el.classList.contains('on'))activeEffects.add(el.dataset.e);else activeEffects.delete(el.dataset.e);}
 function previewTrim(){
-  const edAudio=document.getElementById('editorAudio');
+  const ea=document.getElementById('editorAudio');
   const s=parseFloat(document.getElementById('trimStart').value)||0;
-  edAudio.currentTime=s; edAudio.play(); toast('Preview started');
-  const e=parseFloat(document.getElementById('trimEnd').value)||edAudio.duration;
-  const tid=setInterval(()=>{ if(edAudio.currentTime>=e){edAudio.pause();clearInterval(tid);} },200);
+  const end=parseFloat(document.getElementById('trimEnd').value)||editorDuration;
+  ea.currentTime=s;ea.play();toast('Preview started');
+  const tid=setInterval(()=>{if(ea.currentTime>=end){ea.pause();clearInterval(tid);}},100);
 }
-
 function generateEditCmd(){
   if(!editorFile){toast('Load a file first');return;}
   const s=parseFloat(document.getElementById('trimStart').value)||0;
   const e=parseFloat(document.getElementById('trimEnd').value)||editorDuration;
-  const dur=e-s;
+  const dur=(e-s).toFixed(2);
   const name=editorFile.name.replace(/\.[^.]+$/,'');
   let filters=[];
-  if(activeEffects.has('fadein')) filters.push(`afade=t=in:st=${s}:d=2`);
-  if(activeEffects.has('fadeout')) filters.push(`afade=t=out:st=${e-2}:d=2`);
-  if(activeEffects.has('normalize')) filters.push('loudnorm');
+  if(activeEffects.has('fadein'))filters.push(`afade=t=in:st=${s}:d=2`);
+  if(activeEffects.has('fadeout'))filters.push(`afade=t=out:st=${(e-2).toFixed(2)}:d=2`);
+  if(activeEffects.has('normalize'))filters.push('loudnorm');
   const filter=filters.length?`-af "${filters.join(',')}" `:'';
-  const cmd=`ffmpeg -i "input.mp3" -ss ${s} -t ${dur.toFixed(1)} ${filter}-c:a libmp3lame "${name}_edited.mp3"`;
+  const cmd=`ffmpeg -i "${editorFile.name}" -ss ${s} -t ${dur} ${filter}-c:a libmp3lame "${name}_edited.mp3"`;
   const prev=document.getElementById('editorPreview');
-  prev.textContent=cmd; prev.classList.add('show');
-  cp(cmd,{textContent:'',classList:{add:()=>{},remove:()=>{}}}); 
-  toast('Command copied ✓');
+  prev.textContent=cmd;prev.classList.add('show');
+  navigator.clipboard.writeText(cmd).then(()=>toast('Command copied ✓')).catch(()=>toast('Command generated ✓'));
 }
 
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._tid); t._tid=setTimeout(()=>t.classList.remove('show'),2200); }
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tid);t._tid=setTimeout(()=>t.classList.remove('show'),2200);}
+
+// resize waveform on orientation change
+window.addEventListener('resize',()=>{if(waveData)drawWaveform();});
 </script>
 </body>
 </html>
