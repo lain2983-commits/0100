@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
@@ -7,10 +7,10 @@
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-  <meta name="apple-mobile-web-app-title" content="Extractor"/>
+  <meta name="apple-mobile-web-app-title" content="오디오 추출기"/>
   <link rel="manifest" href="manifest.json"/>
-  <title>Audio Extractor</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <title>오디오 추출기</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     :root{
@@ -20,21 +20,21 @@
       --safe-top:env(safe-area-inset-top,0px);
       --safe-bot:env(safe-area-inset-bottom,0px);
     }
-    html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;overflow-x:hidden;}
+    html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;overflow-x:hidden;}
     body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,#c8d8f0 1px,transparent 1px);background-size:28px 28px;opacity:0.35;pointer-events:none;z-index:0;}
     body::after{content:'';position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue2),var(--blue),#7eb8ff);z-index:100;}
 
     /* INSTALL */
-    #ib{display:none;position:fixed;top:3px;left:0;right:0;z-index:99;background:var(--blue2);color:#fff;padding:calc(var(--safe-top)+10px) 16px 10px;align-items:center;gap:12px;font-size:12px;}
+    #ib{display:none;position:fixed;top:3px;left:0;right:0;z-index:99;background:var(--blue2);color:#fff;padding:calc(var(--safe-top)+10px) 16px 10px;align-items:center;gap:12px;font-size:13px;}
     #ib.show{display:flex;}
     #ib span{flex:1;}
-    .ib-btn{background:#fff;color:var(--blue2);border:none;font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 14px;cursor:pointer;}
-    .ib-x{background:none;border:none;color:rgba(255,255,255,.7);font-size:16px;cursor:pointer;}
+    .ib-btn{background:#fff;color:var(--blue2);border:none;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;padding:7px 16px;cursor:pointer;border-radius:2px;}
+    .ib-x{background:none;border:none;color:rgba(255,255,255,.7);font-size:18px;cursor:pointer;}
 
     /* TABS */
     .tabs{position:sticky;top:3px;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;}
-    .tab{flex:1;padding:13px 2px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;}
-    .tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+    .tab{flex:1;padding:13px 2px;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:500;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+    .tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700;}
 
     /* BODY */
     .body{position:relative;z-index:1;padding:20px 16px calc(var(--safe-bot)+36px);max-width:540px;margin:0 auto;}
@@ -42,51 +42,52 @@
     .page.active{display:block;animation:fu .3s ease;}
     @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-    /* HERO — guaranteed single line */
+    /* HERO — guaranteed no overflow */
     .hero{margin-bottom:20px;}
     .hero h1{
       font-family:'Syne',sans-serif;
-      font-size:clamp(1.3rem,6.5vw,2.2rem);
+      font-size:clamp(1.1rem,5.8vw,2rem);
       font-weight:800;line-height:1.05;
       letter-spacing:-.02em;color:var(--text);
-      white-space:nowrap;overflow:hidden;
+      white-space:nowrap;overflow:hidden;text-overflow:clip;
     }
     .hero h1 .acc{color:var(--blue);}
-    .hero-sub{margin-top:6px;font-size:11px;color:var(--sub);line-height:1.6;}
+    .hero-sub{margin-top:6px;font-size:12px;color:var(--sub);line-height:1.6;}
 
     /* CARD */
     .card{background:var(--surface);border:1px solid var(--border);padding:16px;margin-bottom:10px;position:relative;}
     .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),transparent 60%);opacity:.5;}
-    .lbl{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#222;margin-bottom:10px;font-weight:600;}
+    .lbl{font-size:11px;letter-spacing:.05em;color:#222;margin-bottom:10px;font-weight:700;}
 
     /* URL */
     .url-wrap{display:flex;border:1.5px solid var(--border);background:#fff;transition:border-color .2s,box-shadow .2s;}
     .url-wrap:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,111,255,.1);}
     .url-wrap input{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:11px 12px;}
     .url-wrap input::placeholder{color:#888;}
-    .paste-btn{background:var(--soft);border:none;border-left:1.5px solid var(--border);color:var(--blue);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;padding:0 14px;cursor:pointer;white-space:nowrap;font-weight:600;}
+    .paste-btn{background:var(--soft);border:none;border-left:1.5px solid var(--border);color:var(--blue);font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;padding:0 14px;cursor:pointer;white-space:nowrap;}
 
     /* OPTIONS */
     .opts-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:11px;}
-    .og label{font-size:9px;letter-spacing:.18em;color:#222;display:block;margin-bottom:5px;font-weight:600;}
-    .og select{width:100%;background:#fff;border:1.5px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 10px;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23333' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer;}
+    .og label{font-size:11px;color:#222;display:block;margin-bottom:5px;font-weight:700;}
+    .og select{width:100%;background:#fff;border:1.5px solid var(--border);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;padding:8px 10px;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23333' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer;}
     .og select:focus{border-color:var(--blue);}
     .pills{display:flex;flex-wrap:wrap;gap:5px;}
-    .pill{font-size:10px;padding:4px 9px;border:1.5px solid var(--border);color:#333;cursor:pointer;background:#fff;transition:all .15s;user-select:none;}
+    .pill{font-size:11px;padding:4px 10px;border:1.5px solid var(--border);color:#333;cursor:pointer;background:#fff;transition:all .15s;user-select:none;}
     .pill.on{border-color:var(--blue);color:var(--blue);background:var(--soft);}
 
     /* BUTTONS */
-    .gen-btn{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:.06em;padding:14px;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 20px rgba(26,111,255,.25);-webkit-tap-highlight-color:transparent;transition:opacity .2s,transform .1s;}
+    .gen-btn{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;padding:14px;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 20px rgba(26,111,255,.25);-webkit-tap-highlight-color:transparent;transition:opacity .2s,transform .1s;}
     .gen-btn:active{transform:scale(.98);opacity:.9;}
-    .btn{display:inline-flex;align-items:center;gap:5px;border:1.5px solid var(--border);background:#fff;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 13px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+    .btn{display:inline-flex;align-items:center;gap:5px;border:1.5px solid var(--border);background:#fff;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:12px;padding:9px 14px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;font-weight:500;}
     .btn.pri{background:var(--blue);color:#fff;border-color:var(--blue);}
+    .btn.grn{background:#0d8a50;color:#fff;border-color:#0d8a50;}
     .btn.danger{border-color:#ffccd0;color:#cc2233;}
     .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
 
     /* OUTPUT */
     #output{display:none;}
     #output.show{display:block;animation:fu .3s ease;}
-    .terminal{background:#0d1530;border:1px solid #1a2545;padding:13px;font-size:11px;line-height:1.9;overflow-x:auto;}
+    .terminal{background:#0d1530;border:1px solid #1a2545;padding:13px;font-size:11px;line-height:1.9;overflow-x:auto;font-family:'JetBrains Mono',monospace;}
     .th{display:flex;gap:6px;align-items:center;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #1a2545;}
     .dot{width:9px;height:9px;border-radius:50%;}
     .dot.r{background:#ff5f57;}.dot.y{background:#febc2e;}.dot.g{background:#28c840;}
@@ -94,123 +95,144 @@
     .tp{color:var(--blue);}.tc{color:#c8d8ff;}.tok{color:#4dffb0;}.td{color:#3a4a6a;}
     .isteps{display:flex;flex-direction:column;gap:11px;}
     .istep{display:flex;gap:10px;align-items:flex-start;}
-    .inum{font-size:10px;color:var(--blue);border:1.5px solid var(--blue);width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;background:var(--soft);}
-    .ititle{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text);}
-    .snip{background:#f0f4ff;border:1px solid var(--border);border-left:2px solid var(--blue);padding:7px 10px;font-size:11px;color:var(--blue2);display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;overflow-x:auto;}
+    .inum{font-size:11px;color:var(--blue);border:1.5px solid var(--blue);width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;background:var(--soft);font-weight:700;}
+    .ititle{font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text);}
+    .snip{background:#f0f4ff;border:1px solid var(--border);border-left:2px solid var(--blue);padding:7px 10px;font-size:11px;color:var(--blue2);display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;overflow-x:auto;font-family:'JetBrains Mono',monospace;}
     .snip code{white-space:nowrap;}
-    .cbtn{background:none;border:1px solid var(--border);color:#333;font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 6px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s;}
+    .cbtn{background:none;border:1px solid var(--border);color:#333;font-family:'Noto Sans KR',sans-serif;font-size:10px;padding:3px 8px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s;}
     .cbtn.ok{color:#0d8a50;border-color:#0d8a50;}
 
     /* ══ PLAYER ══ */
-    /* compact upload strip */
-    .upload-strip{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;border:1.5px solid var(--border);cursor:pointer;transition:border-color .2s;margin-bottom:10px;}
+    .upload-strip{display:flex;align-items:center;gap:10px;padding:11px 14px;background:#fff;border:1.5px solid var(--border);cursor:pointer;transition:border-color .2s;margin-bottom:10px;}
     .upload-strip:hover,.upload-strip.drag{border-color:var(--blue);background:var(--soft);}
     .upload-strip input{display:none;}
-    .upload-strip .uicon{font-size:18px;flex-shrink:0;}
-    .upload-strip .utext{font-size:12px;color:var(--blue);font-weight:600;}
-    .upload-strip .usub{font-size:10px;color:#555;margin-top:1px;}
+    .upload-strip .uicon{font-size:20px;flex-shrink:0;}
+    .upload-strip .utext{font-size:13px;color:var(--blue);font-weight:700;}
+    .upload-strip .usub{font-size:11px;color:#555;margin-top:1px;}
 
     .player-card{display:none;background:var(--surface);border:1px solid var(--border);padding:16px;position:relative;}
     .player-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),transparent 60%);opacity:.5;}
     .player-card.show{display:block;animation:fu .3s ease;}
-    .np-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;}
-    .np-time{font-size:11px;color:#444;margin-bottom:14px;}
+    .np-title{font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;}
+    .np-time{font-size:12px;color:#444;margin-bottom:14px;}
     .prog-outer{position:relative;height:6px;background:var(--border);cursor:pointer;border-radius:3px;margin-bottom:5px;}
     .prog-fill{position:absolute;top:0;left:0;height:100%;background:var(--blue);border-radius:3px;pointer-events:none;}
-    .prog-thumb{position:absolute;top:50%;width:16px;height:16px;background:var(--blue);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 2px 6px rgba(26,111,255,.4);cursor:pointer;}
-    .time-row{display:flex;justify-content:space-between;font-size:10px;color:#444;margin-bottom:16px;}
+    .prog-thumb{position:absolute;top:50%;width:18px;height:18px;background:var(--blue);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 2px 8px rgba(26,111,255,.4);cursor:pointer;}
+    .time-row{display:flex;justify-content:space-between;font-size:11px;color:#444;margin-bottom:16px;}
     .controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:0 2px;}
     .ci{background:none;border:none;cursor:pointer;padding:10px;-webkit-tap-highlight-color:transparent;transition:opacity .2s;display:flex;align-items:center;justify-content:center;}
     .ci:active{opacity:.5;}
     .ci.active svg{stroke:var(--blue);}
-    .ci svg{width:22px;height:22px;stroke:#222;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-    .pi{width:50px;height:50px;border-radius:50%;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(26,111,255,.35);-webkit-tap-highlight-color:transparent;transition:transform .1s;}
+    .ci svg{width:24px;height:24px;stroke:#222;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+    .pi{width:52px;height:52px;border-radius:50%;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(26,111,255,.35);-webkit-tap-highlight-color:transparent;transition:transform .1s;}
     .pi:active{transform:scale(.92);}
-    .pi svg{width:20px;height:20px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .pi svg{width:22px;height:22px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
     .vol-row{display:flex;align-items:center;gap:10px;}
-    .vol-row svg{width:16px;height:16px;stroke:#333;fill:none;stroke-width:1.8;flex-shrink:0;}
-    .vol-slider{flex:1;height:3px;background:var(--border);-webkit-appearance:none;appearance:none;outline:none;cursor:pointer;}
-    .vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--blue);}
+    .vol-row svg{width:18px;height:18px;stroke:#333;fill:none;stroke-width:1.8;flex-shrink:0;}
+    .vol-slider{flex:1;height:4px;background:var(--border);-webkit-appearance:none;appearance:none;outline:none;cursor:pointer;}
+    .vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--blue);}
     .pl-card{display:none;background:var(--surface);border:1px solid var(--border);margin-top:10px;}
     .pl-card.show{display:block;}
     .pl-hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);}
-    .pl-hdr span{font-size:10px;letter-spacing:.15em;color:#222;font-weight:600;}
+    .pl-hdr span{font-size:12px;color:#222;font-weight:700;}
     .playlist{max-height:200px;overflow-y:auto;}
-    .pli{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+    .pli{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
     .pli:last-child{border-bottom:none;}
     .pli:hover,.pli.playing{background:var(--soft);}
-    .pli.playing .pln{color:var(--blue);font-weight:600;}
-    .plnum{font-size:10px;color:#444;width:18px;text-align:center;flex-shrink:0;}
+    .pli.playing .pln{color:var(--blue);font-weight:700;}
+    .plnum{font-size:11px;color:#444;width:20px;text-align:center;flex-shrink:0;}
     .pln{flex:1;font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .pld{font-size:10px;color:#555;flex-shrink:0;}
-    .plx{background:none;border:none;color:#aaa;font-size:14px;cursor:pointer;padding:0 2px;}
+    .pld{font-size:11px;color:#555;flex-shrink:0;}
+    .plx{background:none;border:none;color:#aaa;font-size:15px;cursor:pointer;padding:0 2px;}
     .plx:active{color:#cc2233;}
-    .pl-empty{padding:20px;text-align:center;font-size:12px;color:#555;}
+    .pl-empty{padding:20px;text-align:center;font-size:13px;color:#555;}
 
     /* ══ EDITOR ══ */
-    /* compact upload */
-    .ed-upload-strip{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;border:1.5px solid var(--border);cursor:pointer;transition:border-color .2s;margin-bottom:10px;}
-    .ed-upload-strip:hover{border-color:var(--blue);background:var(--soft);}
-    .ed-upload-strip input{display:none;}
-    .ed-upload-strip .uicon{font-size:18px;flex-shrink:0;}
-    .ed-upload-strip .utext{font-size:12px;color:var(--blue);font-weight:600;}
-    .ed-upload-strip .usub{font-size:10px;color:#555;margin-top:1px;}
+    .ed-strip{display:flex;align-items:center;gap:10px;padding:11px 14px;background:#fff;border:1.5px solid var(--border);cursor:pointer;transition:border-color .2s;margin-bottom:10px;}
+    .ed-strip:hover{border-color:var(--blue);background:var(--soft);}
+    .ed-strip input{display:none;}
+    .ed-strip .uicon{font-size:20px;flex-shrink:0;}
+    .ed-strip .utext{font-size:13px;color:var(--blue);font-weight:700;}
+    .ed-strip .usub{font-size:11px;color:#555;margin-top:1px;}
 
     /* waveform */
     .wave-ctrl{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
-    .wz-btn{background:#fff;border:1.5px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 11px;cursor:pointer;}
+    .wz-btn{background:#fff;border:1.5px solid var(--border);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:12px;padding:6px 13px;cursor:pointer;font-weight:500;}
     .wz-btn:active{background:var(--soft);border-color:var(--blue);}
-    .wz-lbl{font-size:10px;color:#333;margin-left:auto;}
+    .wz-lbl{font-size:11px;color:#333;margin-left:auto;font-weight:700;}
 
-    /* waveform canvas container */
     .wave-outer{position:relative;background:#f0f4ff;border:1px solid var(--border);overflow:hidden;touch-action:none;user-select:none;}
     canvas#wc{display:block;width:100%;height:80px;}
 
-    /* START handle — top */
-    .handle-row-top{display:flex;align-items:center;gap:8px;margin-top:6px;}
-    /* END handle — bottom */
-    .handle-row-bot{display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:8px;}
-    .handle-lbl{font-size:10px;color:#222;font-weight:600;white-space:nowrap;width:38px;}
-    .handle-val{font-size:11px;color:var(--blue);font-weight:700;width:58px;}
-    .handle-slider{flex:1;height:4px;background:var(--border);-webkit-appearance:none;appearance:none;outline:none;cursor:pointer;}
-    .handle-slider.start::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--blue2);border:2px solid #fff;box-shadow:0 2px 6px rgba(13,71,204,.4);}
-    .handle-slider.end::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 2px 6px rgba(26,111,255,.4);}
-    .handle-slider.start::-webkit-slider-runnable-track{background:linear-gradient(to right,rgba(13,71,204,.3) var(--pct,0%),var(--border) var(--pct,0%));height:4px;}
-    .handle-slider.end::-webkit-slider-runnable-track{background:linear-gradient(to right,rgba(26,111,255,.3) var(--pct,0%),var(--border) var(--pct,0%));height:4px;}
+    /* ── SLIDER HANDLES — large & centered ── */
+    .handle-wrap{margin-top:10px;display:flex;flex-direction:column;gap:10px;}
 
-    .wave-scrollbar{width:100%;height:5px;background:var(--border);margin-top:4px;position:relative;cursor:pointer;border-radius:3px;}
+    .handle-row{display:flex;align-items:center;gap:10px;}
+    .handle-lbl{
+      font-size:11px;color:#fff;font-weight:700;
+      background:var(--blue2);padding:4px 8px;
+      white-space:nowrap;flex-shrink:0;min-width:52px;text-align:center;
+    }
+    .handle-lbl.end-lbl{background:var(--blue);}
+    .handle-val{font-size:12px;color:var(--blue);font-weight:700;flex-shrink:0;min-width:56px;text-align:right;}
+
+    /* slider track + thumb — BIG */
+    .hslider{
+      flex:1;height:6px;
+      background:var(--border);
+      -webkit-appearance:none;appearance:none;outline:none;cursor:pointer;
+      border-radius:3px;
+    }
+    .hslider::-webkit-slider-runnable-track{height:6px;border-radius:3px;}
+    .hslider.start::-webkit-slider-runnable-track{background:linear-gradient(to right,rgba(13,71,204,.35) var(--pct,0%),var(--border) var(--pct,0%));}
+    .hslider.end::-webkit-slider-runnable-track{background:linear-gradient(to right,rgba(26,111,255,.35) var(--pct,0%),var(--border) var(--pct,0%));}
+    /* BIG thumb — 28px, easy to touch */
+    .hslider::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      width:28px;height:28px;
+      border-radius:50%;
+      background:var(--blue2);
+      border:3px solid #fff;
+      box-shadow:0 2px 8px rgba(13,71,204,.45);
+      margin-top:-11px;
+    }
+    .hslider.end::-webkit-slider-thumb{background:var(--blue);}
+
+    .wave-scrollbar{width:100%;height:6px;background:var(--border);margin-top:6px;position:relative;cursor:pointer;border-radius:3px;}
     .wave-sthumb{position:absolute;top:0;height:100%;background:var(--blue);border-radius:3px;opacity:.5;}
-    .trim-info{display:flex;justify-content:space-between;font-size:11px;color:#111;margin:6px 0;font-weight:500;}
+    .trim-info{display:flex;justify-content:space-between;font-size:12px;color:#111;margin:8px 0;font-weight:500;}
     .trim-info span{color:var(--blue);font-weight:700;}
 
     .effect-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px;}
-    .efp{font-size:10px;padding:4px 11px;border:1.5px solid var(--border);color:#333;cursor:pointer;background:#fff;transition:all .15s;user-select:none;}
+    .efp{font-size:12px;padding:5px 12px;border:1.5px solid var(--border);color:#333;cursor:pointer;background:#fff;transition:all .15s;user-select:none;}
     .efp.on{border-color:var(--blue);color:var(--blue);background:var(--soft);}
     pre.ed-pre{width:100%;background:#0d1530;color:#4dffb0;font-family:'JetBrains Mono',monospace;font-size:10px;padding:10px 12px;margin-bottom:10px;display:none;line-height:1.7;white-space:pre-wrap;word-break:break-all;border:none;}
     pre.ed-pre.show{display:block;}
+
+    /* SAVE */
+    .save-section{display:none;background:var(--soft);border:1px solid #c0d4ff;padding:14px;margin-top:10px;}
+    .save-section.show{display:block;}
+    .save-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .save-input{flex:1;min-width:140px;background:#fff;border:1.5px solid var(--border);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;padding:9px 12px;outline:none;}
+    .save-input:focus{border-color:var(--blue);}
 
     /* GUIDE */
     .us{display:flex;gap:12px;align-items:flex-start;padding:14px;background:var(--surface);border:1px solid var(--border);margin-bottom:9px;position:relative;}
     .us::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),transparent 60%);opacity:.4;}
     .un{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--soft);line-height:1;flex-shrink:0;width:28px;text-align:center;-webkit-text-stroke:1.5px var(--blue);}
-    .ut{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:3px;color:var(--text);}
-    .ud{font-size:11px;color:#222;line-height:1.7;}
-    .ud strong{color:var(--blue);font-weight:600;}
-    .unote{background:var(--soft);border:1px solid #c0d4ff;padding:11px 13px;margin-top:9px;font-size:11px;color:#0d2a70;line-height:1.7;}
+    .ut{font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;margin-bottom:3px;color:var(--text);}
+    .ud{font-size:12px;color:#222;line-height:1.7;}
+    .ud strong{color:var(--blue);font-weight:700;}
+    .unote{background:var(--soft);border:1px solid #c0d4ff;padding:11px 13px;margin-top:9px;font-size:12px;color:#0d2a70;line-height:1.7;}
     .unote strong{font-weight:700;display:block;margin-bottom:3px;color:var(--blue2);}
 
-    /* COPYRIGHT */
-    .cpbox{background:#fff8f0;border:1px solid #f0d0a0;border-left:3px solid #e07000;padding:12px;margin-top:10px;font-size:11px;color:#5a3800;line-height:1.8;}
-    .cpbox strong{display:block;font-size:12px;color:#3a2000;margin-bottom:4px;}
-
-    /* FOOTER */
+    .cpbox{background:#fff8f0;border:1px solid #f0d0a0;border-left:3px solid #e07000;padding:12px;margin-top:10px;font-size:12px;color:#5a3800;line-height:1.8;}
+    .cpbox strong{display:block;font-size:13px;color:#3a2000;margin-bottom:4px;}
     .footer{margin-top:24px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
-    .fc{font-size:10px;color:#333;letter-spacing:.1em;}
-    .fc span{color:var(--blue);font-weight:600;}
-    .fv{font-size:10px;color:#aaa;}
-
-    /* TOAST */
-    .toast{position:fixed;bottom:calc(var(--safe-bot)+18px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--blue2);color:#fff;font-size:11px;padding:9px 18px;opacity:0;transition:all .3s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:0 4px 20px rgba(13,71,204,.3);}
+    .fc{font-size:11px;color:#333;letter-spacing:.05em;}
+    .fc span{color:var(--blue);font-weight:700;}
+    .fv{font-size:11px;color:#aaa;}
+    .toast{position:fixed;bottom:calc(var(--safe-bot)+18px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--blue2);color:#fff;font-size:12px;padding:10px 20px;opacity:0;transition:all .3s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:0 4px 20px rgba(13,71,204,.3);font-family:'Noto Sans KR',sans-serif;}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
     @keyframes blink{50%{opacity:0;}}
     .cursor{display:inline-block;width:7px;height:11px;background:var(--blue);vertical-align:middle;animation:blink 1s infinite;}
@@ -221,44 +243,44 @@
 <body>
 
 <div id="ib">
-  <span>📱 Install as app</span>
-  <button class="ib-btn" id="installBtn">INSTALL</button>
+  <span>📱 홈 화면에 앱으로 설치하기</span>
+  <button class="ib-btn" id="installBtn">설치</button>
   <button class="ib-x" id="dismissBtn">✕</button>
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="sw('extractor',this)">EXTRACT</button>
-  <button class="tab" onclick="sw('player',this)">PLAYER</button>
-  <button class="tab" onclick="sw('editor',this)">EDITOR</button>
-  <button class="tab" onclick="sw('howto',this)">GUIDE</button>
+  <button class="tab active" onclick="sw('extractor',this)">추출기</button>
+  <button class="tab" onclick="sw('player',this)">플레이어</button>
+  <button class="tab" onclick="sw('editor',this)">편집기</button>
+  <button class="tab" onclick="sw('howto',this)">가이드</button>
 </div>
 
 <div class="body">
 
-  <!-- ══ EXTRACTOR ══ -->
+  <!-- ══ 추출기 ══ -->
   <div class="page active" id="page-extractor">
     <div class="hero">
       <h1>AUDIO <span class="acc">EXTRACTOR</span></h1>
-      <p class="hero-sub">Paste YouTube URL → Generate command → Run in terminal</p>
+      <p class="hero-sub">YouTube URL 붙여넣기 → 커맨드 생성 → 터미널 실행</p>
     </div>
     <div class="card">
-      <div class="lbl">01 — Source URL</div>
+      <div class="lbl">01 — YouTube URL</div>
       <div class="url-wrap">
         <input type="url" id="urlInput" inputmode="url" placeholder="https://youtu.be/..."/>
-        <button class="paste-btn" onclick="doPaste()">PASTE</button>
+        <button class="paste-btn" onclick="doPaste()">붙여넣기</button>
       </div>
     </div>
     <div class="card">
-      <div class="lbl">02 — Output Settings</div>
+      <div class="lbl">02 — 출력 설정</div>
       <div class="opts-row">
-        <div class="og"><label>Format</label>
+        <div class="og"><label>형식</label>
           <select id="fmtSel" onchange="syncPills()">
             <option value="mp3">MP3</option><option value="m4a">M4A</option>
             <option value="wav">WAV</option><option value="flac">FLAC</option>
             <option value="aac">AAC</option><option value="opus">OPUS</option>
           </select>
         </div>
-        <div class="og"><label>Quality</label>
+        <div class="og"><label>품질</label>
           <select id="qualSel">
             <option value="128">128 kbps</option><option value="192" selected>192 kbps</option>
             <option value="256">256 kbps</option><option value="320">320 kbps ★</option>
@@ -271,47 +293,45 @@
         <div class="pill" data-v="aac">AAC</div><div class="pill" data-v="opus">OPUS</div>
       </div>
     </div>
-    <button class="gen-btn" onclick="generate()">▶ &nbsp;GENERATE COMMAND</button>
+    <button class="gen-btn" onclick="generate()">▶ 커맨드 생성</button>
     <div id="output">
       <div class="card">
-        <div class="lbl">03 — Command Output</div>
+        <div class="lbl">03 — 실행 커맨드</div>
         <div class="terminal">
           <div class="th"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="tl">bash</span></div>
           <div id="termBody"></div>
         </div>
       </div>
       <div class="card">
-        <div class="lbl">Setup Guide</div>
+        <div class="lbl">설치 가이드</div>
         <div class="isteps">
-          <div class="istep"><div class="inum">1</div><div><div class="ititle">Install yt-dlp</div><div class="snip"><code>pip install yt-dlp</code><button class="cbtn" onclick="cp('pip install yt-dlp',this)">COPY</button></div></div></div>
-          <div class="istep"><div class="inum">2</div><div><div class="ititle">Install ffmpeg</div>
+          <div class="istep"><div class="inum">1</div><div><div class="ititle">yt-dlp 설치</div><div class="snip"><code>pip install yt-dlp</code><button class="cbtn" onclick="cp('pip install yt-dlp',this)">복사</button></div></div></div>
+          <div class="istep"><div class="inum">2</div><div><div class="ititle">ffmpeg 설치</div>
             <div class="snip"><code>brew install ffmpeg</code><button class="cbtn" onclick="cp('brew install ffmpeg',this)">macOS</button></div>
             <div class="snip"><code>sudo apt install ffmpeg</code><button class="cbtn" onclick="cp('sudo apt install ffmpeg',this)">Ubuntu</button></div>
             <div class="snip"><code>winget install ffmpeg</code><button class="cbtn" onclick="cp('winget install ffmpeg',this)">Windows</button></div>
           </div></div>
-          <div class="istep"><div class="inum">3</div><div><div class="ititle">Run command</div>
-            <div class="snip"><code id="finalCmd" style="color:var(--blue2)">Generate above ↑</code><button class="cbtn" onclick="cpFinal(this)">COPY</button></div>
+          <div class="istep"><div class="inum">3</div><div><div class="ititle">커맨드 실행</div>
+            <div class="snip"><code id="finalCmd" style="color:var(--blue2)">위에서 생성하세요 ↑</code><button class="cbtn" onclick="cpFinal(this)">복사</button></div>
           </div></div>
         </div>
       </div>
     </div>
     <div class="cpbox"><strong>⚠ 저작권 안내 / Copyright Notice</strong>본 도구는 개인적, 비상업적 용도로만 사용하세요.<br/>저작권이 있는 콘텐츠의 무단 다운로드, 배포, 상업적 이용을 금지합니다.</div>
-    <div class="footer"><div class="fc">MADE BY <span>추인엽</span></div><div class="fv">v6.0 · PWA</div></div>
+    <div class="footer"><div class="fc">MADE BY <span>추인엽</span></div><div class="fv">v7.0 · PWA</div></div>
   </div>
 
-  <!-- ══ PLAYER ══ -->
+  <!-- ══ 플레이어 ══ -->
   <div class="page" id="page-player">
     <div class="hero">
       <h1>AUDIO <span class="acc">PLAYER</span></h1>
-      <p class="hero-sub">Upload files · Playlist · Shuffle · Repeat</p>
+      <p class="hero-sub">파일 추가 · 재생목록 · 셔플 · 반복</p>
     </div>
-
     <label class="upload-strip" id="playerUpload">
       <input type="file" id="playerFile" accept="audio/*" multiple/>
       <span class="uicon">🎵</span>
-      <div><div class="utext">Add audio files</div><div class="usub">MP3 · WAV · FLAC · M4A · AAC</div></div>
+      <div><div class="utext">오디오 파일 추가</div><div class="usub">MP3 · WAV · FLAC · M4A · AAC</div></div>
     </label>
-
     <div class="player-card" id="playerCard">
       <div class="np-title" id="npTitle">—</div>
       <div class="np-time" id="npTime">0:00 / 0:00</div>
@@ -343,93 +363,102 @@
         <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>
       </div>
     </div>
-
     <div class="pl-card" id="plCard">
-      <div class="pl-hdr"><span>PLAYLIST (<span id="plCount">0</span>)</span><button class="btn danger" style="font-size:9px;padding:3px 8px" onclick="clearPl()">CLEAR ALL</button></div>
-      <div class="playlist" id="playlist"><div class="pl-empty">No files added</div></div>
+      <div class="pl-hdr"><span>재생목록 (<span id="plCount">0</span>곡)</span><button class="btn danger" style="font-size:11px;padding:4px 10px" onclick="clearPl()">전체 삭제</button></div>
+      <div class="playlist" id="playlist"><div class="pl-empty">파일을 추가하세요</div></div>
     </div>
     <div class="cpbox" style="margin-top:10px"><strong>⚠ 저작권 안내</strong>개인 소장 파일만 재생하세요. 무단 배포 금지.</div>
-    <div class="footer"><div class="fc">MADE BY <span>추인엽</span></div><div class="fv">v6.0 · PWA</div></div>
+    <div class="footer"><div class="fc">MADE BY <span>추인엽</span></div><div class="fv">v7.0 · PWA</div></div>
   </div>
 
-  <!-- ══ EDITOR ══ -->
+  <!-- ══ 편집기 ══ -->
   <div class="page" id="page-editor">
     <div class="hero">
       <h1>AUDIO <span class="acc">EDITOR</span></h1>
-      <p class="hero-sub">Drag waveform · Zoom · Fade · Export</p>
+      <p class="hero-sub">파형 드래그 · 구간 선택 · 효과 · 저장</p>
     </div>
-
-    <label class="ed-upload-strip" id="edUpload">
+    <label class="ed-strip" id="edUpload">
       <input type="file" id="edFile" accept="audio/*"/>
       <span class="uicon">✂️</span>
-      <div><div class="utext" id="edFileName">Load audio file</div><div class="usub">Drag or tap to select</div></div>
+      <div><div class="utext" id="edFileName">오디오 파일 불러오기</div><div class="usub">드래그 또는 탭으로 선택</div></div>
     </label>
-
     <div id="edPanel" style="display:none">
       <div class="card">
-        <div class="lbl">WAVEFORM — drag to select</div>
+        <div class="lbl">파형 — 드래그로 구간 선택</div>
         <div class="wave-ctrl">
-          <button class="wz-btn" onclick="zoom(-1)">− Out</button>
-          <button class="wz-btn" onclick="zoom(1)">+ In</button>
+          <button class="wz-btn" onclick="zoom(-1)">− 축소</button>
+          <button class="wz-btn" onclick="zoom(1)">+ 확대</button>
           <span class="wz-lbl" id="zoomLbl">1×</span>
         </div>
         <div class="wave-outer" id="waveOuter"><canvas id="wc"></canvas></div>
 
-        <!-- START handle (top) -->
-        <div class="handle-row-top">
-          <span class="handle-lbl">▶ START</span>
-          <input type="range" class="handle-slider start" id="startSlider" min="0" max="100" step="0.01" value="0" oninput="onStartSlider()"/>
-          <span class="handle-val" id="startVal">0.00s</span>
-        </div>
-        <!-- END handle (bottom) -->
-        <div class="handle-row-bot">
-          <span class="handle-lbl">■ END</span>
-          <input type="range" class="handle-slider end" id="endSlider" min="0" max="100" step="0.01" value="100" oninput="onEndSlider()"/>
-          <span class="handle-val" id="endVal">0.00s</span>
+        <!-- 큰 슬라이더 핸들 -->
+        <div class="handle-wrap">
+          <div class="handle-row">
+            <span class="handle-lbl">▶ 시작</span>
+            <input type="range" class="hslider start" id="startSlider" min="0" max="100" step="0.01" value="0" oninput="onStartSlider()"/>
+            <span class="handle-val" id="startVal">0.00s</span>
+          </div>
+          <div class="handle-row">
+            <span class="handle-lbl end-lbl">■ 끝</span>
+            <input type="range" class="hslider end" id="endSlider" min="0" max="100" step="0.01" value="100" oninput="onEndSlider()"/>
+            <span class="handle-val" id="endVal">0.00s</span>
+          </div>
         </div>
 
         <div class="wave-scrollbar" id="wSb"><div class="wave-sthumb" id="wSt"></div></div>
         <div class="trim-info">
-          <div>Start: <span id="tsL">0.00s</span></div>
-          <div>End: <span id="teL">0.00s</span></div>
-          <div>Duration: <span id="tdL">0.00s</span></div>
+          <div>시작: <span id="tsL">0.00s</span></div>
+          <div>끝: <span id="teL">0.00s</span></div>
+          <div>길이: <span id="tdL">0.00s</span></div>
         </div>
       </div>
 
       <div class="card">
-        <div class="lbl">EFFECTS</div>
+        <div class="lbl">효과</div>
         <div class="effect-row">
-          <div class="efp" data-e="fadein" onclick="toggleEfx(this)">Fade In</div>
-          <div class="efp" data-e="fadeout" onclick="toggleEfx(this)">Fade Out</div>
-          <div class="efp" data-e="normalize" onclick="toggleEfx(this)">Normalize</div>
+          <div class="efp" data-e="fadein" onclick="toggleEfx(this)">페이드 인</div>
+          <div class="efp" data-e="fadeout" onclick="toggleEfx(this)">페이드 아웃</div>
+          <div class="efp" data-e="normalize" onclick="toggleEfx(this)">노말라이즈</div>
         </div>
-        <div class="lbl" style="margin-top:4px">GENERATED COMMAND</div>
+        <div class="lbl" style="margin-top:4px">생성된 커맨드</div>
         <pre class="ed-pre" id="edPre"></pre>
         <div class="btn-row">
-          <button class="btn pri" onclick="previewTrim()">▶ Preview</button>
-          <button class="btn" onclick="genEditCmd()">⚙ Generate Command</button>
+          <button class="btn pri" onclick="previewTrim()">▶ 미리듣기</button>
+          <button class="btn" onclick="genEditCmd()">⚙ 커맨드 생성</button>
         </div>
       </div>
-      <div class="card"><div class="lbl">PLAYBACK</div><audio id="edAudio" controls style="width:100%"></audio></div>
+
+      <!-- 저장 섹션 -->
+      <div class="save-section" id="saveSection">
+        <div class="lbl" style="margin-bottom:10px">💾 다른 이름으로 저장</div>
+        <div class="save-row">
+          <input type="text" class="save-input" id="saveFilename" placeholder="파일명 입력 (확장자 없이)"/>
+          <button class="btn grn" onclick="saveFile()">저장</button>
+        </div>
+        <div style="font-size:11px;color:#555;margin-top:6px">선택한 구간이 브라우저에서 직접 다운로드됩니다</div>
+      </div>
+
+      <div class="card"><div class="lbl">재생</div><audio id="edAudio" controls style="width:100%"></audio></div>
     </div>
     <div class="cpbox" style="margin-top:10px"><strong>⚠ 저작권 안내</strong>개인 소장 파일만 편집하세요. 무단 배포 금지.</div>
-    <div class="footer"><div class="fc">MADE BY <span>추인엽</span></div><div class="fv">v6.0 · PWA</div></div>
+    <div class="footer"><div class="fc">MADE BY <span>추인엽</span></div><div class="fv">v7.0 · PWA</div></div>
   </div>
 
-  <!-- ══ GUIDE ══ -->
+  <!-- ══ 가이드 ══ -->
   <div class="page" id="page-howto">
     <div class="hero">
       <h1>HOW TO <span class="acc">USE</span></h1>
-      <p class="hero-sub">Step-by-step guide</p>
+      <p class="hero-sub">단계별 사용 가이드</p>
     </div>
-    <div class="us"><div class="un">1</div><div><div class="ut">Copy YouTube URL</div><div class="ud">유튜브 주소 복사<br/><strong>예: https://youtu.be/XXXXXXX</strong></div></div></div>
-    <div class="us"><div class="un">2</div><div><div class="ut">EXTRACT → Paste & Generate</div><div class="ud">PASTE 후 <strong>GENERATE COMMAND</strong> 클릭</div></div></div>
-    <div class="us"><div class="un">3</div><div><div class="ut">Terminal에서 실행</div><div class="ud">커맨드를 복사해 PC 터미널에서 실행<br/><strong>yt-dlp와 ffmpeg 설치 필요</strong></div></div></div>
-    <div class="us"><div class="un">4</div><div><div class="ut">PLAYER → 재생</div><div class="ud">파일 불러와 <strong>반복·셔플·재생목록</strong>으로 감상</div></div></div>
-    <div class="us"><div class="un">5</div><div><div class="ut">EDITOR → 편집</div><div class="ud"><strong>파형 드래그</strong>로 구간 선택, START/END 슬라이더로 정밀 조정<br/>페이드 효과 후 ffmpeg 커맨드 생성</div></div></div>
-    <div class="unote"><strong>💡 지원 형식</strong>MP3 · WAV · FLAC · M4A · AAC · OPUS</div>
+    <div class="us"><div class="un">1</div><div><div class="ut">YouTube URL 복사</div><div class="ud">유튜브 영상 주소를 복사하세요<br/><strong>예: https://youtu.be/XXXXXXX</strong></div></div></div>
+    <div class="us"><div class="un">2</div><div><div class="ut">추출기 → 붙여넣기 & 생성</div><div class="ud">붙여넣기 후 <strong>커맨드 생성</strong> 클릭</div></div></div>
+    <div class="us"><div class="un">3</div><div><div class="ut">터미널에서 실행</div><div class="ud">생성된 커맨드를 PC 터미널에서 실행<br/><strong>yt-dlp와 ffmpeg 설치 필요</strong></div></div></div>
+    <div class="us"><div class="un">4</div><div><div class="ut">플레이어 → 재생</div><div class="ud">파일 불러와 <strong>반복·셔플·재생목록</strong>으로 감상</div></div></div>
+    <div class="us"><div class="un">5</div><div><div class="ut">편집기 → 구간 편집 & 저장</div><div class="ud"><strong>파형 드래그</strong>로 구간 선택<br/>시작/끝 슬라이더로 정밀 조정 후 <strong>저장</strong></div></div></div>
+    <div class="unote"><strong>💡 지원 형식</strong>MP3 · WAV · FLAC · M4A · AAC · OPUS<br/><br/><strong>⚠ 백그라운드 재생</strong>브라우저 설정에 따라 화면 꺼도 재생 유지 가능</div>
     <div class="cpbox"><strong>⚠ 저작권 안내 / Copyright Notice</strong>본 도구는 개인적, 비상업적 용도로만 사용하세요.<br/>저작권이 있는 콘텐츠의 무단 다운로드 및 배포는 저작권법에 위반됩니다.<br/>상업적 이용 및 무단 재배포를 금지합니다.</div>
-    <div class="footer"><div class="fc">MADE BY <span>추인엽</span></div><div class="fv">v6.0 · PWA</div></div>
+    <div class="footer"><div class="fc">MADE BY <span>추인엽</span></div><div class="fv">v7.0 · PWA</div></div>
   </div>
 
 </div>
@@ -441,28 +470,39 @@
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 let dp=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;document.getElementById('ib').classList.add('show');});
-document.getElementById('installBtn').addEventListener('click',async()=>{if(!dp)return;dp.prompt();const{outcome}=await dp.userChoice;if(outcome==='accepted')toast('App installed ✓');dp=null;document.getElementById('ib').classList.remove('show');});
+document.getElementById('installBtn').addEventListener('click',async()=>{
+  if(!dp)return;dp.prompt();
+  const{outcome}=await dp.userChoice;
+  if(outcome==='accepted')toast('앱이 설치되었습니다 ✓');
+  dp=null;document.getElementById('ib').classList.remove('show');
+});
 document.getElementById('dismissBtn').addEventListener('click',()=>document.getElementById('ib').classList.remove('show'));
 
 // TABS
-function sw(name,btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('page-'+name).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+function sw(name,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('page-'+name).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
 // EXTRACTOR
 document.querySelectorAll('#page-extractor .pill').forEach(p=>p.addEventListener('click',()=>{document.getElementById('fmtSel').value=p.dataset.v;syncPills();}));
 function syncPills(){const v=document.getElementById('fmtSel').value;document.querySelectorAll('#page-extractor .pill').forEach(p=>p.classList.toggle('on',p.dataset.v===v));}
-async function doPaste(){try{const t=await navigator.clipboard.readText();document.getElementById('urlInput').value=t;toast('Pasted ✓');}catch{toast('Clipboard permission required');}}
+async function doPaste(){try{const t=await navigator.clipboard.readText();document.getElementById('urlInput').value=t;toast('붙여넣기 완료 ✓');}catch{toast('클립보드 권한이 필요합니다');}}
 function generate(){
   const url=document.getElementById('urlInput').value.trim();
   const fmt=document.getElementById('fmtSel').value;
   const q=document.getElementById('qualSel').value;
-  if(!url){toast('Enter a YouTube URL');return;}
-  if(!url.includes('youtube')&&!url.includes('youtu.be')){toast('Valid YouTube URL required');return;}
+  if(!url){toast('YouTube URL을 입력하세요');return;}
+  if(!url.includes('youtube')&&!url.includes('youtu.be')){toast('올바른 YouTube URL을 입력하세요');return;}
   const cmd=`yt-dlp -x --audio-format ${fmt} --audio-quality ${q}k "${url}"`;
-  document.getElementById('termBody').innerHTML=`<div><span class="tp">❯</span> <span class="tc">${esc(cmd)}</span></div><div class="td">[yt-dlp] Fetching...</div><div class="td">[download] 100% of ~4.20MiB</div><div class="td">[ffmpeg] → .${fmt}</div><div class="tok" style="margin-top:4px">✔ Done → output.${fmt}</div><span class="cursor"></span>`;
+  document.getElementById('termBody').innerHTML=`<div><span class="tp">❯</span> <span class="tc">${esc(cmd)}</span></div><div class="td">[yt-dlp] 메타데이터 수집 중...</div><div class="td">[download] 100% of ~4.20MiB</div><div class="td">[ffmpeg] 오디오 추출 → .${fmt}</div><div class="tok" style="margin-top:4px">✔ 완료 → output.${fmt}</div><span class="cursor"></span>`;
   document.getElementById('finalCmd').textContent=cmd;
   const o=document.getElementById('output');o.classList.add('show');
   setTimeout(()=>o.scrollIntoView({behavior:'smooth',block:'start'}),80);
-  toast('Command generated ✓');
+  toast('커맨드 생성 완료 ✓');
 }
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function cp(t,b){navigator.clipboard.writeText(t).then(()=>{const o=b.textContent;b.textContent='✓';b.classList.add('ok');setTimeout(()=>{b.textContent=o;b.classList.remove('ok');},1500);});}
@@ -471,22 +511,28 @@ function cpFinal(b){cp(document.getElementById('finalCmd').textContent,b);}
 // PLAYER
 const aud=document.getElementById('mainAudio');
 let pl=[],ci=0,shuffled=false,repeat=0,shOrd=[];
+
 document.getElementById('playerFile').addEventListener('change',e=>addFiles(Array.from(e.target.files)));
 const pup=document.getElementById('playerUpload');
 pup.addEventListener('dragover',e=>{e.preventDefault();pup.classList.add('drag');});
 pup.addEventListener('dragleave',()=>pup.classList.remove('drag'));
 pup.addEventListener('drop',e=>{e.preventDefault();pup.classList.remove('drag');addFiles(Array.from(e.dataTransfer.files));});
+
 function addFiles(files){
   const af=files.filter(f=>f.type.startsWith('audio/'));
   af.forEach(f=>pl.push({name:f.name.replace(/\.[^.]+$/,''),url:URL.createObjectURL(f),dur:'—'}));
-  renderPl();if(pl.length>0&&pl.length===af.length)loadT(0);
-  document.getElementById('playerCard').classList.add('show');document.getElementById('plCard').classList.add('show');
-  toast(af.length+' file(s) added');
+  renderPl();
+  if(af.length>0){
+    if(pl.length===af.length)loadT(0);
+    document.getElementById('playerCard').classList.add('show');
+    document.getElementById('plCard').classList.add('show');
+  }
+  toast(af.length+'곡 추가됨');
 }
 function renderPl(){
   document.getElementById('plCount').textContent=pl.length;
   const el=document.getElementById('playlist');
-  if(!pl.length){el.innerHTML='<div class="pl-empty">No files added</div>';return;}
+  if(!pl.length){el.innerHTML='<div class="pl-empty">파일을 추가하세요</div>';return;}
   el.innerHTML=pl.map((t,i)=>`<div class="pli ${i===ci?'playing':''}" onclick="loadT(${i});aud.play();updIco()"><span class="plnum">${i===ci?'▶':i+1}</span><span class="pln">${t.name}</span><span class="pld">${t.dur}</span><button class="plx" onclick="remT(event,${i})">✕</button></div>`).join('');
 }
 function loadT(idx){if(idx<0||idx>=pl.length)return;ci=idx;aud.src=pl[idx].url;document.getElementById('npTitle').textContent=pl[idx].name;renderPl();}
@@ -500,10 +546,27 @@ function nextAuto(){
   if(n===0&&repeat===0){aud.pause();updIco();return;}
   loadT(n);aud.play();
 }
-function toggleShuffle(){shuffled=!shuffled;document.getElementById('btnShuffle').classList.toggle('active',shuffled);if(shuffled)shOrd=[...Array(pl.length).keys()].sort(()=>Math.random()-.5);toast(shuffled?'Shuffle ON':'Shuffle OFF');}
-function toggleRepeat(){repeat=(repeat+1)%3;document.getElementById('btnRepeat').classList.toggle('active',repeat>0);toast(['Repeat OFF','Repeat ONE','Repeat ALL'][repeat]);}
+function toggleShuffle(){shuffled=!shuffled;document.getElementById('btnShuffle').classList.toggle('active',shuffled);if(shuffled)shOrd=[...Array(pl.length).keys()].sort(()=>Math.random()-.5);toast(shuffled?'셔플 켜짐':'셔플 꺼짐');}
+function toggleRepeat(){repeat=(repeat+1)%3;document.getElementById('btnRepeat').classList.toggle('active',repeat>0);toast(['반복 없음','1곡 반복','전체 반복'][repeat]);}
 function remT(e,i){e.stopPropagation();URL.revokeObjectURL(pl[i].url);pl.splice(i,1);if(ci>=pl.length)ci=Math.max(0,pl.length-1);renderPl();}
-function clearPl(){pl.forEach(t=>URL.revokeObjectURL(t.url));pl=[];aud.pause();aud.src='';updIco();document.getElementById('npTitle').textContent='—';document.getElementById('playerCard').classList.remove('show');document.getElementById('plCard').classList.remove('show');renderPl();}
+function clearPl(){
+  // 버그 수정: 재생 중지 후 삭제
+  aud.pause();
+  aud.src='';
+  updIco();
+  pl.forEach(t=>URL.revokeObjectURL(t.url));
+  pl=[];ci=0;
+  document.getElementById('npTitle').textContent='—';
+  document.getElementById('npTime').textContent='0:00 / 0:00';
+  document.getElementById('progFill').style.width='0%';
+  document.getElementById('progThumb').style.left='0%';
+  document.getElementById('tCur').textContent='0:00';
+  document.getElementById('tDur').textContent='0:00';
+  document.getElementById('playerCard').classList.remove('show');
+  document.getElementById('plCard').classList.remove('show');
+  renderPl();
+  toast('재생목록이 삭제되었습니다');
+}
 aud.addEventListener('ended',nextAuto);
 aud.addEventListener('timeupdate',()=>{
   if(!aud.duration)return;
@@ -521,7 +584,8 @@ function ft(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<1
 
 // EDITOR
 let edFile=null,edDur=0,waveData=null,zoomLv=1,scrollOff=0;
-let selS=null,selE=null,dragging=false,dragX=0,activeEfx=new Set();
+let selS=0,selE=0,dragging=false,dragX=0,activeEfx=new Set();
+let editorBuffer=null;
 const MAX_Z=32;
 
 document.getElementById('edFile').addEventListener('change',e=>loadEd(e.target.files[0]));
@@ -536,16 +600,19 @@ async function loadEd(file){
   document.getElementById('edFileName').textContent=file.name;
   document.getElementById('edAudio').src=URL.createObjectURL(file);
   document.getElementById('edPanel').style.display='block';
-  toast('Loading waveform...');
+  document.getElementById('saveSection').classList.remove('show');
+  document.getElementById('saveFilename').value=file.name.replace(/\.[^.]+$/,'')+'_편집';
+  toast('파형 로딩 중...');
   try{
     const ctx=new AudioContext();
     const buf=await file.arrayBuffer();
     const dec=await ctx.decodeAudioData(buf);
-    edDur=dec.duration; waveData=dec.getChannelData(0);
+    editorBuffer=dec;
+    edDur=dec.duration;waveData=dec.getChannelData(0);
     zoomLv=1;scrollOff=0;selS=0;selE=edDur;
     setSliders();drawW();updateSb();updateTrimInfo();
-    ctx.close();toast('File loaded ✓');
-  }catch(e){console.warn(e);toast('Error loading file');}
+    ctx.close();toast('파일 로드 완료 ✓');
+  }catch(e){console.warn(e);toast('파일 로드 오류');}
 }
 
 function zoom(d){
@@ -556,7 +623,6 @@ function zoom(d){
   document.getElementById('zoomLbl').textContent=zoomLv+'×';
   drawW();updateSb();
 }
-
 function drawW(){
   if(!waveData)return;
   const outer=document.getElementById('waveOuter');
@@ -567,36 +633,24 @@ function drawW(){
   const vis=edDur/zoomLv;
   const s0=Math.floor((scrollOff/edDur)*waveData.length);
   const s1=Math.floor(((scrollOff+vis)/edDur)*waveData.length);
-  const sc=s1-s0;
-  const step=Math.max(1,Math.floor(sc/W));
+  const step=Math.max(1,Math.floor((s1-s0)/W));
   ctx.fillStyle='#f0f4ff';ctx.fillRect(0,0,W,H);
-  // selection
   if(selS!==null&&selE!==null){
     const sx=t2px(selS,W,vis),ex=t2px(selE,W,vis);
-    ctx.fillStyle='rgba(26,111,255,0.15)';ctx.fillRect(sx,0,ex-sx,H);
+    ctx.fillStyle='rgba(26,111,255,0.15)';ctx.fillRect(Math.min(sx,ex),0,Math.abs(ex-sx),H);
   }
-  // wave
   ctx.strokeStyle='#1a6fff';ctx.lineWidth=1;
   for(let i=0;i<W;i++){
     let mx=0;for(let j=0;j<step;j++){const v=Math.abs(waveData[s0+i*step+j]||0);if(v>mx)mx=v;}
     const y=(1-mx)*H/2;ctx.beginPath();ctx.moveTo(i,y);ctx.lineTo(i,H-y);ctx.stroke();
   }
-  // handles
   if(selS!==null){const x=t2px(selS,W,vis);ctx.strokeStyle='#0d47cc';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   if(selE!==null){const x=t2px(selE,W,vis);ctx.strokeStyle='#1a6fff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
 }
-
 function t2px(t,W,vis){return((t-scrollOff)/vis)*W;}
 function px2t(px,W,vis){return scrollOff+(px/W)*vis;}
+function updateSb(){const th=document.getElementById('wSt');const vis=edDur/zoomLv;th.style.width=((vis/edDur)*100)+'%';th.style.left=((scrollOff/edDur)*100)+'%';}
 
-function updateSb(){
-  const th=document.getElementById('wSt');
-  const vis=edDur/zoomLv;
-  th.style.width=((vis/edDur)*100)+'%';
-  th.style.left=((scrollOff/edDur)*100)+'%';
-}
-
-// waveform drag (mouse + touch)
 const wo=document.getElementById('waveOuter');
 wo.addEventListener('mousedown',wStart);
 wo.addEventListener('touchstart',e=>wStart(e.touches[0]),{passive:true});
@@ -606,97 +660,126 @@ wo.addEventListener('mouseup',wEnd);
 wo.addEventListener('touchend',wEnd);
 document.addEventListener('mouseup',wEnd);
 
-function wStart(e){
-  if(!waveData)return;
-  dragging=true;
-  const r=wo.getBoundingClientRect();
-  const vis=edDur/zoomLv;
-  const t=Math.max(0,Math.min(px2t(e.clientX-r.left,r.width,vis),edDur));
-  dragX=e.clientX-r.left;selS=t;selE=t;
-  setSliders();drawW();
-}
-function wMove(e){
-  if(!dragging||!waveData)return;
-  const r=wo.getBoundingClientRect();
-  const vis=edDur/zoomLv;
-  const t=Math.max(0,Math.min(px2t(e.clientX-r.left,r.width,vis),edDur));
-  if(e.clientX-r.left>=dragX)selE=t;else selS=t;
-  setSliders();drawW();
-}
-function wEnd(){
-  if(!dragging)return;
-  dragging=false;
-  if(selS>selE)[selS,selE]=[selE,selS];
-  setSliders();updateTrimInfo();drawW();
-}
+function wStart(e){if(!waveData)return;dragging=true;const r=wo.getBoundingClientRect();const vis=edDur/zoomLv;dragX=e.clientX-r.left;const t=Math.max(0,Math.min(px2t(dragX,r.width,vis),edDur));selS=t;selE=t;setSliders();drawW();}
+function wMove(e){if(!dragging||!waveData)return;const r=wo.getBoundingClientRect();const vis=edDur/zoomLv;const t=Math.max(0,Math.min(px2t(e.clientX-r.left,r.width,vis),edDur));if(e.clientX-r.left>=dragX)selE=t;else selS=t;setSliders();drawW();}
+function wEnd(){if(!dragging)return;dragging=false;if(selS>selE)[selS,selE]=[selE,selS];setSliders();updateTrimInfo();drawW();}
 
-// scrollbar click
 document.getElementById('wSb').addEventListener('click',e=>{
-  if(!edDur)return;
-  const r=e.currentTarget.getBoundingClientRect();
-  const vis=edDur/zoomLv;
+  if(!edDur)return;const r=e.currentTarget.getBoundingClientRect();const vis=edDur/zoomLv;
   scrollOff=Math.max(0,Math.min((e.clientX-r.left)/r.width*edDur,edDur-vis));
   drawW();updateSb();
 });
 
-// START slider
 function onStartSlider(){
   const v=parseFloat(document.getElementById('startSlider').value);
-  selS=v/100*edDur;
-  if(selS>selE)selE=selS;
-  setSliderTrack('startSlider',v);
-  updateTrimInfo();drawW();
+  selS=v/100*edDur;if(selS>selE)selE=selS;
+  setPct('startSlider',v);updateTrimInfo();drawW();
+  document.getElementById('startVal').textContent=selS.toFixed(2)+'s';
 }
-// END slider
 function onEndSlider(){
   const v=parseFloat(document.getElementById('endSlider').value);
-  selE=v/100*edDur;
-  if(selE<selS)selS=selE;
-  setSliderTrack('endSlider',v);
-  updateTrimInfo();drawW();
+  selE=v/100*edDur;if(selE<selS)selS=selE;
+  setPct('endSlider',v);updateTrimInfo();drawW();
+  document.getElementById('endVal').textContent=selE.toFixed(2)+'s';
 }
-function setSliderTrack(id,pct){document.getElementById(id).style.setProperty('--pct',pct+'%');}
-
+function setPct(id,v){document.getElementById(id).style.setProperty('--pct',v+'%');}
 function setSliders(){
   if(!edDur)return;
   const sp=(selS/edDur)*100,ep=(selE/edDur)*100;
-  document.getElementById('startSlider').value=sp;
-  document.getElementById('endSlider').value=ep;
-  setSliderTrack('startSlider',sp);
-  setSliderTrack('endSlider',ep);
-  document.getElementById('startVal').textContent=(selS||0).toFixed(2)+'s';
-  document.getElementById('endVal').textContent=(selE||0).toFixed(2)+'s';
+  document.getElementById('startSlider').value=sp;document.getElementById('endSlider').value=ep;
+  setPct('startSlider',sp);setPct('endSlider',ep);
+  document.getElementById('startVal').textContent=selS.toFixed(2)+'s';
+  document.getElementById('endVal').textContent=selE.toFixed(2)+'s';
   updateTrimInfo();
 }
 function updateTrimInfo(){
-  const s=selS||0,e=selE||0;
-  document.getElementById('tsL').textContent=s.toFixed(2)+'s';
-  document.getElementById('teL').textContent=e.toFixed(2)+'s';
-  document.getElementById('tdL').textContent=Math.max(0,e-s).toFixed(2)+'s';
+  document.getElementById('tsL').textContent=selS.toFixed(2)+'s';
+  document.getElementById('teL').textContent=selE.toFixed(2)+'s';
+  document.getElementById('tdL').textContent=Math.max(0,selE-selS).toFixed(2)+'s';
 }
 function toggleEfx(el){el.classList.toggle('on');if(el.classList.contains('on'))activeEfx.add(el.dataset.e);else activeEfx.delete(el.dataset.e);}
 function previewTrim(){
-  const ea=document.getElementById('edAudio');
-  ea.currentTime=selS||0;ea.play();toast('Preview started');
-  const end=selE||edDur;
-  const tid=setInterval(()=>{if(ea.currentTime>=end){ea.pause();clearInterval(tid);}},100);
+  const ea=document.getElementById('edAudio');ea.currentTime=selS;ea.play();toast('미리듣기 시작');
+  const tid=setInterval(()=>{if(ea.currentTime>=selE){ea.pause();clearInterval(tid);}},100);
 }
 function genEditCmd(){
-  if(!edFile){toast('Load a file first');return;}
-  const s=(selS||0).toFixed(2),e=(selE||edDur).toFixed(2);
-  const dur=(parseFloat(e)-parseFloat(s)).toFixed(2);
+  if(!edFile){toast('파일을 먼저 불러오세요');return;}
+  const s=selS.toFixed(2),e=selE.toFixed(2),dur=(selE-selS).toFixed(2);
   const name=edFile.name.replace(/\.[^.]+$/,'');
   let filters=[];
   if(activeEfx.has('fadein'))filters.push(`afade=t=in:st=${s}:d=2`);
-  if(activeEfx.has('fadeout'))filters.push(`afade=t=out:st=${(parseFloat(e)-2).toFixed(2)}:d=2`);
+  if(activeEfx.has('fadeout'))filters.push(`afade=t=out:st=${(selE-2).toFixed(2)}:d=2`);
   if(activeEfx.has('normalize'))filters.push('loudnorm');
   const af=filters.length?`-af "${filters.join(',')}" `:'';
   const cmd=`ffmpeg -i "${edFile.name}" -ss ${s} -t ${dur} ${af}-c:a libmp3lame "${name}_edited.mp3"`;
   const pre=document.getElementById('edPre');pre.textContent=cmd;pre.classList.add('show');
-  navigator.clipboard.writeText(cmd).then(()=>toast('Command copied ✓')).catch(()=>toast('Command generated ✓'));
+  document.getElementById('saveSection').classList.add('show');
+  navigator.clipboard.writeText(cmd).then(()=>toast('커맨드 복사됨 ✓')).catch(()=>toast('커맨드 생성됨 ✓'));
 }
 
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tid);t._tid=setTimeout(()=>t.classList.remove('show'),2200);}
+// 저장 기능 (Web Audio API로 구간 잘라서 다운로드)
+async function saveFile(){
+  if(!editorBuffer){toast('파일을 먼저 불러오세요');return;}
+  const name=document.getElementById('saveFilename').value.trim()||'edited';
+  toast('저장 중...');
+  try{
+    const sr=editorBuffer.sampleRate;
+    const startSample=Math.floor(selS*sr);
+    const endSample=Math.floor(selE*sr);
+    const length=endSample-startSample;
+    const offCtx=new OfflineAudioContext(editorBuffer.numberOfChannels,length,sr);
+    const src=offCtx.createBufferSource();
+    // 구간 잘라내기
+    const newBuf=offCtx.createBuffer(editorBuffer.numberOfChannels,length,sr);
+    for(let ch=0;ch<editorBuffer.numberOfChannels;ch++){
+      const chData=editorBuffer.getChannelData(ch).slice(startSample,endSample);
+      newBuf.copyToChannel(chData,ch);
+    }
+    src.buffer=newBuf;
+    // 페이드 효과
+    const gainNode=offCtx.createGain();
+    if(activeEfx.has('fadein')){gainNode.gain.setValueAtTime(0,0);gainNode.gain.linearRampToValueAtTime(1,2);}
+    if(activeEfx.has('fadeout')){const dur=length/sr;gainNode.gain.setValueAtTime(1,Math.max(0,dur-2));gainNode.gain.linearRampToValueAtTime(0,dur);}
+    src.connect(gainNode);gainNode.connect(offCtx.destination);
+    src.start();
+    const rendered=await offCtx.startRendering();
+    // WAV 인코딩
+    const wav=encodeWAV(rendered);
+    const blob=new Blob([wav],{type:'audio/wav'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=name+'.wav';a.click();
+    URL.revokeObjectURL(url);
+    toast('저장 완료 ✓ (WAV)');
+  }catch(e){console.error(e);toast('저장 오류: '+e.message);}
+}
+
+function encodeWAV(buffer){
+  const numCh=buffer.numberOfChannels;
+  const sr=buffer.sampleRate;
+  const numFrames=buffer.length;
+  const bitsPerSample=16;
+  const byteRate=sr*numCh*(bitsPerSample/8);
+  const blockAlign=numCh*(bitsPerSample/8);
+  const dataSize=numFrames*blockAlign;
+  const ab=new ArrayBuffer(44+dataSize);
+  const view=new DataView(ab);
+  function ws(off,str){for(let i=0;i<str.length;i++)view.setUint8(off+i,str.charCodeAt(i));}
+  ws(0,'RIFF');view.setUint32(4,36+dataSize,true);ws(8,'WAVE');
+  ws(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);
+  view.setUint16(22,numCh,true);view.setUint32(24,sr,true);
+  view.setUint32(28,byteRate,true);view.setUint16(32,blockAlign,true);
+  view.setUint16(34,bitsPerSample,true);ws(36,'data');view.setUint32(40,dataSize,true);
+  let offset=44;
+  for(let i=0;i<numFrames;i++){
+    for(let ch=0;ch<numCh;ch++){
+      const s=Math.max(-1,Math.min(1,buffer.getChannelData(ch)[i]));
+      view.setInt16(offset,s<0?s*0x8000:s*0x7FFF,true);offset+=2;
+    }
+  }
+  return ab;
+}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tid);t._tid=setTimeout(()=>t.classList.remove('show'),2500);}
 window.addEventListener('resize',()=>{if(waveData)drawW();});
 </script>
 </body>
